@@ -1,28 +1,8 @@
+# vsutil
 A collection of general-purpose Vapoursynth functions to be reused in modules and scripts.
 
-## Functions
-For more detail please check out the docstrings in the Python script.
-* *get_subsampling*(clip):<br>
-    Returns the subsampling of a given clip
+The goal for vsutil is to allow authors of various "func" scripts to make use of premade helper functions instead of having to write their own. 
 
-* *get_depth*(clip):<br>
-    Returns the bitdepth of a given clip
+There are various benefits to this. For starters, only one script will require updating if anything is changed in Vapoursynth instead of every single func. This also helps unmaintained scripts from breaking and never being fixed. Additionally this will also be a good resource for new authors and makes functions easier to write and read.
 
-* *iterate*(base, function, count):<br>
-	Executes a given function for the given amount of times
-
-* *insert_clip*(clip, insert, start_frame):<br>
-    Inserts a given clip into another one<br>
-        The inserted clip cannot go beyond the final frame of the source clip
-
-* *fallback*(value, fallback value):<br>
-    Returns a value or the fallback value if the value is None
-
-* *get_y*(clip):<br>
-    Returns the luma of a given clip
-
-* *split*(clip)<br>
-    Returns a list of planes for the given clip
-
-* *join*(planes, family): (Default: family=YUV)<br>
-    Joins the supplied list of planes
+As this is a community-driven project, contributions are heavily encouraged. VSUtil will be continually updated to ensure it is up-to-date with changes to Vapoursynth and to include various pull requests sent in by contributors.
