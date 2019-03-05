@@ -39,7 +39,6 @@ def iterate(base, function, count):
     """
     Utility function that executes a given function for a given number of times.
     """
-    
     return reduce(lambda v,_: function(v), range(count), base)
 
 
