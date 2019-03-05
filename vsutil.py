@@ -1,6 +1,7 @@
 """
 VSUtil. A collection of general-purpose Vapoursynth functions to be reused in modules and scripts.
 """
+from functools import reduce
 import vapoursynth as vs
 
 core = vs.core
@@ -38,9 +39,8 @@ def iterate(base, function, count):
     """
     Utility function that executes a given function for a given number of times.
     """
-    for _ in range(count):
-        base = function(base)
-    return base
+    
+    return reduce(lambda v,_: function(v), range(count), base)
 
 
 def insert_clip(clip: vs.VideoNode, insert: vs.VideoNode, start_frame: int) -> vs.VideoNode:
