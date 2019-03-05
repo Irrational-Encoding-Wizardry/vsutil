@@ -3,6 +3,7 @@ VSUtil. A collection of general-purpose Vapoursynth functions to be reused in mo
 """
 from functools import reduce
 import vapoursynth as vs
+import re
 
 core = vs.core
 
@@ -85,3 +86,44 @@ def join(planes: list, family=vs.YUV) -> vs.VideoNode:
     Joins the supplied list of planes into a YUV video node.
     """
     return core.std.ShufflePlanes(clips=planes, planes=[0], colorfamily=family)
+
+
+def getw(h, ar=16 / 9, only_even=True):
+    """
+    returns width for image (taken from kagefunc)
+    """
+    w = h * ar
+    w = int(round(w))
+    if only_even:
+        w = w // 2 * 2
+    return w
+
+
+def is_image(filename: str) -> bool:
+    """
+    Returns true if a filename refers to an image.
+    """
+    return bool(re.search(r'\.(png|jpe?g|bmp|tiff?)$', filename))
+
+
+def source(file: str, force_lsmas=False) -> vs.VideoNode:
+    """
+    Quick general import wrapper that automatically matches various sources with an appropriate indexing filter.
+    """
+    if file.startswith("file:///"):
+        file = file[8::]
+
+    if force_lsmas:
+        clip = core.lsmas.LWLibavSource(file)
+    else:
+        if file.endswith(".d2v"):
+            clip = core.d2v.Source(file)
+        elif is_image(file):
+            clip = core.imwri.Read(file)
+        else:
+            if file.endswith(".m2ts"):
+                clip = core.lsmas.LWLibavSource(file)
+            else:
+                clip = core.ffms2.Source(file)
+
+    return clip
