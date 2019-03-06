@@ -2,7 +2,7 @@
 VSUtil. A collection of general-purpose Vapoursynth functions to be reused in modules and scripts.
 """
 from functools import reduce
-from typing import Callable, TypeVar, Union, List
+from typing import Callable, TypeVar, Union, List, Optional
 import vapoursynth as vs
 
 core = vs.core
@@ -61,7 +61,7 @@ def insert_clip(clip: vs.VideoNode, insert: vs.VideoNode, start_frame: int) -> v
     return pre + insert + post
 
 
-def fallback(value: T, fallback_value: V) -> Union[T, V]:
+def fallback(value: Optional[T], fallback_value: V) -> Union[T, V]:
     """
     Utility function that returns a value or a fallback if the value is None.
     """
