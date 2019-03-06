@@ -3,8 +3,7 @@ VSUtil. A collection of general-purpose Vapoursynth functions to be reused in mo
 """
 from functools import reduce
 import vapoursynth as vs
-import mimetypes                    # added by stux!
-import re
+import mimetypes
 
 core = vs.core
 
