@@ -107,7 +107,7 @@ def is_image(filename: str) -> bool:
     return mimetypes.types_map.get(os.path.splitext(filename)[-1], "").startswith("image/")
 
 
-def source(file: str, force_lsmas=False) -> vs.VideoNode:
+def source(file: str, force_lsmas: bool=False) -> vs.VideoNode:
     """
     Quick general import wrapper that automatically matches various sources with an appropriate indexing filter.
     """
