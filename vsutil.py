@@ -7,7 +7,6 @@ import vapoursynth as vs
 
 core = vs.core
 T = TypeVar("T")
-V = TypeVar("V")
 
 def get_subsampling(clip: vs.VideoNode) -> str:
     """
@@ -61,7 +60,7 @@ def insert_clip(clip: vs.VideoNode, insert: vs.VideoNode, start_frame: int) -> v
     return pre + insert + post
 
 
-def fallback(value: Optional[T], fallback_value: V) -> Union[T, V]:
+def fallback(value: Optional[T], fallback_value: T) -> T:
     """
     Utility function that returns a value or a fallback if the value is None.
     """
