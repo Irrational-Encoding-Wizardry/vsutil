@@ -104,7 +104,7 @@ def is_image(filename: str) -> bool:
     """
     Returns true if a filename refers to an image.
     """
-    return mimetypes.types_map[os.path.splitext(filename)[-1]].startswith("image/")
+    return mimetypes.types_map.get(os.path.splitext(filename)[-1], "").startswith("image/")
 
 
 def source(file: str, force_lsmas=False) -> vs.VideoNode:
@@ -116,27 +116,15 @@ def source(file: str, force_lsmas=False) -> vs.VideoNode:
 
     if force_lsmas:
         return core.lsmas.LWLibavSource(file)
-        
+
     if file.endswith(".d2v"):
         clip = core.d2v.Source(file)
     elif is_image(file):
         clip = core.imwri.Read(file)
-    elif file.endswith(".m2ts"):
-        clip = core.lsmas.LWLibavSource(file)
     else:
-        clip = core.ffms2.Source(file)
-
-    return clip 
-        clip = core.lsmas.LWLibavSource(file)
-    else:
-        if file.endswith(".d2v"):
-            clip = core.d2v.Source(file)
-        elif is_image(file):
-            clip = core.imwri.Read(file)
+        if file.endswith(".m2ts"):
+            clip = core.lsmas.LWLibavSource(file)
         else:
-            if file.endswith(".m2ts"):
-                clip = core.lsmas.LWLibavSource(file)
-            else:
-                clip = core.ffms2.Source(file)
+            clip = core.ffms2.Source(file)
 
     return clip
