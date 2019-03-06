@@ -4,6 +4,7 @@ VSUtil. A collection of general-purpose Vapoursynth functions to be reused in mo
 from functools import reduce
 from typing import Callable, TypeVar, Union, List, Optional
 import vapoursynth as vs
+import mimetypes
 
 core = vs.core
 T = TypeVar("T")
@@ -86,3 +87,23 @@ def join(planes: List[vs.VideoNode], family=vs.YUV) -> vs.VideoNode:
     Joins the supplied list of planes into a YUV video node.
     """
     return core.std.ShufflePlanes(clips=planes, planes=[0], colorfamily=family)
+
+
+def getw(h: int, ar: float=16/9, only_even: bool=True) -> int:
+    """
+    returns width for image (taken from kagefunc)
+    """
+    w = h * ar
+    w = int(round(w))
+    if only_even:
+        w = w // 2 * 2
+    return w
+
+
+def is_image(filename: str) -> bool:
+    """
+    Returns true if a filename refers to an image.
+    """
+    return mimetypes.types_map.get(os.path.splitext(filename)[-1], "").startswith("image/")
+
+
