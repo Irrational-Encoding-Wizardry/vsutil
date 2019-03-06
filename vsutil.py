@@ -89,7 +89,7 @@ def join(planes: list, family=vs.YUV) -> vs.VideoNode:
     return core.std.ShufflePlanes(clips=planes, planes=[0], colorfamily=family)
 
 
-def getw(h, ar=16 / 9, only_even=True):
+def getw(h: int, ar: float=16/9, only_even: bool=True) -> int:
     """
     returns width for image (taken from kagefunc)
     """
