@@ -37,7 +37,7 @@ def get_depth(clip: vs.VideoNode) -> int:
     return clip.format.bits_per_sample
 
 
-def get_plane_size(frame: VideoFrame, planeno: int) -> Tuple[int, int]:
+def get_plane_size(frame: vs.VideoFrame, planeno: int) -> Tuple[int, int]:
     """
     Calculates the size of the plane
     
