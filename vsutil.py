@@ -106,24 +106,3 @@ def is_image(filename: str) -> bool:
     return mimetypes.types_map.get(os.path.splitext(filename)[-1], "").startswith("image/")
 
 
-def source(file: str, force_lsmas: bool=False) -> vs.VideoNode:
-    """
-    Quick general import wrapper that automatically matches various sources with an appropriate indexing filter.
-    """
-    if file.startswith("file:///"):
-        file = file[8::]
-
-    if force_lsmas:
-        return core.lsmas.LWLibavSource(file)
-
-    if file.endswith(".d2v"):
-        clip = core.d2v.Source(file)
-    elif is_image(file):
-        clip = core.imwri.Read(file)
-    else:
-        if file.endswith(".m2ts"):
-            clip = core.lsmas.LWLibavSource(file)
-        else:
-            clip = core.ffms2.Source(file)
-
-    return clip
