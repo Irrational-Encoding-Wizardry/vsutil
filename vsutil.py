@@ -2,10 +2,11 @@
 VSUtil. A collection of general-purpose Vapoursynth functions to be reused in modules and scripts.
 """
 from functools import reduce
+from typing import Callable, TypeVar, Union, List, Optional
 import vapoursynth as vs
 
 core = vs.core
-
+T = TypeVar("T")
 
 def get_subsampling(clip: vs.VideoNode) -> str:
     """
@@ -35,7 +36,7 @@ def get_depth(clip: vs.VideoNode) -> int:
     return clip.format.bits_per_sample
 
 
-def iterate(base, function, count):
+def iterate(base: T, function: Callable[[T], T], count: int) -> T:
     """
     Utility function that executes a given function for a given number of times.
     """
@@ -59,7 +60,7 @@ def insert_clip(clip: vs.VideoNode, insert: vs.VideoNode, start_frame: int) -> v
     return pre + insert + post
 
 
-def fallback(value, fallback_value):
+def fallback(value: Optional[T], fallback_value: T) -> T:
     """
     Utility function that returns a value or a fallback if the value is None.
     """
@@ -73,14 +74,14 @@ def get_y(clip: vs.VideoNode) -> vs.VideoNode:
     return core.std.ShufflePlanes(clip, 0, vs.GRAY)
 
 
-def split(clip: vs.VideoNode) -> list:
+def split(clip: vs.VideoNode) -> List[vs.VideoNode]:
     """
     Returns a list of planes for the given input clip.
     """
     return [core.std.ShufflePlanes(clip, x, colorfamily=vs.GRAY) for x in range(clip.format.num_planes)]
 
 
-def join(planes: list, family=vs.YUV) -> vs.VideoNode:
+def join(planes: List[vs.VideoNode], family=vs.YUV) -> vs.VideoNode:
     """
     Joins the supplied list of planes into a YUV video node.
     """
