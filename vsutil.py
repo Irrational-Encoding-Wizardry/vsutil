@@ -2,7 +2,7 @@
 VSUtil. A collection of general-purpose Vapoursynth functions to be reused in modules and scripts.
 """
 from functools import reduce
-from typing import Callable, TypeVar, List, Optional
+from typing import Callable, TypeVar, Union, List, Tuple, Optional
 import vapoursynth as vs
 import mimetypes
 import os
@@ -36,6 +36,28 @@ def get_depth(clip: vs.VideoNode) -> int:
     Returns the bitdepth of a clip as an integer.
     """
     return clip.format.bits_per_sample
+
+
+def get_plane_size(frame: Union[vs.VideoFrame, vs.VideoNode], planeno: int) -> Tuple[int, int]:
+    """
+    Calculates the size of the plane
+    
+    :param frame:    The frame
+    :param planeno:  The plane
+    :return: (width, height)
+    """
+    # Add additional checks on Video Nodes as their size and format can be variable.
+    if isinstance(frame, vs.VideoNode):        
+        if frame.width == 0:
+            raise ValueError("Cannot calculate plane size of variable size clip. Pass a frame instead.")
+        if frame.format is None:
+            raise ValueError("Cannot calculate plane size of variable format clip. Pass a frame instead.")
+        
+    width, height = frame.width, frame.height
+    if planeno != 0:
+        width >>= frame.format.subsampling_w
+        height >>= frame.format.subsampling_h
+    return width, height
 
 
 def iterate(base: T, function: Callable[[T], T], count: int) -> T:
