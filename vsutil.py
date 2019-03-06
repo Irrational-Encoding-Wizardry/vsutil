@@ -89,15 +89,16 @@ def join(planes: List[vs.VideoNode], family=vs.YUV) -> vs.VideoNode:
     return core.std.ShufflePlanes(clips=planes, planes=[0], colorfamily=family)
 
 
-def getw(h: int, ar: float=16/9, only_even: bool=True) -> int:
+def get_w(height: int, aspect_ratio: float=16/9, only_even: bool=True) -> int:
     """
-    returns width for image (taken from kagefunc)
+    Calculates the width for a clip with the given height and aspect ratio.
+    only_even is True by default because it imitates the math behind most standard resolutions (e.g. 854x480).
     """
-    w = h * ar
-    w = int(round(w))
+    width = height * aspect_ratio
+    width = int(round(width))
     if only_even:
-        w = w // 2 * 2
-    return w
+        width = width // 2 * 2
+    return width
 
 
 def is_image(filename: str) -> bool:
