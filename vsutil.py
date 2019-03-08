@@ -123,6 +123,25 @@ def join(planes: List[vs.VideoNode], family=vs.YUV) -> vs.VideoNode:
     return core.std.ShufflePlanes(clips=planes, planes=[0], colorfamily=family)
 
 
+def frame2clip(frame: vs.VideoFrame) -> vs.VideoNode
+    """
+    Converts a vapoursynth frame to a clip.
+    
+    :param frame: The frame to wrap.
+    :returns:     A one-frame VideoNode that yields the frame passed to the function.
+    """
+    bc = core.std.BlankClip(
+        width=frame.width,
+        height=frame.height,
+        length=1,
+        fpsnum=1,
+        fpsden=1,
+        format=frame.format.id
+    )
+
+    return bc.std.ModifyFrame([bc], lambda n, f: frame.copy())
+
+
 def get_w(height: int, aspect_ratio: float=16/9, only_even: bool=True) -> int:
     """
     Calculates the width for a clip with the given height and aspect ratio.
