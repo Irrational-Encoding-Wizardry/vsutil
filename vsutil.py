@@ -91,18 +91,29 @@ def fallback(value: Optional[T], fallback_value: T) -> T:
     return fallback_value if value is None else value
 
 
+def plane(clip: vs.VideoNode, planeno: int) -> vs.VideoNode:
+    """
+    Extract the plane with the given index from the clip.
+    
+    :param clip:     The clip to extract the plane from.
+    :param planeno:  The planeno that specifies which plane to extract.
+    :return: A grayscale clip that only contains the given plane.
+    """
+    return core.std.ShufflePlanes(clip, planeno, vs.GRAY)
+
+
 def get_y(clip: vs.VideoNode) -> vs.VideoNode:
     """
     Helper to get the luma of a VideoNode.
     """
-    return core.std.ShufflePlanes(clip, 0, vs.GRAY)
+    return plane(clip, 0)
 
 
 def split(clip: vs.VideoNode) -> List[vs.VideoNode]:
     """
     Returns a list of planes for the given input clip.
     """
-    return [core.std.ShufflePlanes(clip, x, colorfamily=vs.GRAY) for x in range(clip.format.num_planes)]
+    return [plane(clip, x) for x in range(clip.format.num_planes)]
 
 
 def join(planes: List[vs.VideoNode], family=vs.YUV) -> vs.VideoNode:
