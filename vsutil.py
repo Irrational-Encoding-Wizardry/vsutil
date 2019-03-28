@@ -3,12 +3,59 @@ VSUtil. A collection of general-purpose Vapoursynth functions to be reused in mo
 """
 from functools import reduce
 from typing import Callable, TypeVar, Union, List, Tuple, Optional
+from threading import Thread
+from contextlib import contextmanager
 import vapoursynth as vs
 import mimetypes
 import os
 
 core = vs.core
 T = TypeVar("T")
+
+
+class VSThread(Thread):
+    """
+    This class implements everything you need to
+    do multithreading in VapourSynth.
+    
+    It will check if you are in standalone mode, in which
+    this is essentially a no-op, or in VSScript where it
+    will set the environment you need to enable VSScript-Support.
+    
+    It will fail for R44 or older if the script is using vsscript.
+    """
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Use the currently activated 
+        self.environment = self._find_environment()
+    
+    def _find_environment(self):
+        @contextmanager
+        def _noop():
+            yield
+            
+        if not hasattr(vs, "vpy_current_environment"):
+            if vs._using_vsscript:
+                raise EnvironmentError("Spawning threads is not supported in your version of VapourSynth")
+        return vs.vpy_current_environment()
+    
+    def _bootstrap(self):
+        with self.environment:
+            super()._bootstrap()
+            
+
+def is_vsscript():
+    """
+    Since VSScript-VapourSynth behaves differently than
+    
+    """
+    if hasattr(vs, "vpy_current_environment"):
+        return vs.vpy_current_environment().is_single()
+    else:
+        return vs._using_vsscript
+
 
 def get_subsampling(clip: vs.VideoNode) -> str:
     """
