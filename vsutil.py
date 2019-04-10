@@ -32,13 +32,16 @@ class VSThread(Thread):
         self.environment = self._find_environment()
     
     def _find_environment(self):
-        @contextmanager
-        def _noop():
-            yield
-            
         if not hasattr(vs, "vpy_current_environment"):
             if vs._using_vsscript:
                 raise EnvironmentError("Spawning threads is not supported in your version of VapourSynth")
+                
+            # Create a noop since we do not use vsscript.
+            # This means, the vapoursynth module is threadsafe at this point in time.
+            @contextmanager
+            def _noop():
+                yield
+            return _noop
         return vs.vpy_current_environment()
     
     def _bootstrap(self):
