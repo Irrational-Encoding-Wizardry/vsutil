@@ -10,6 +10,7 @@ import os
 core = vs.core
 T = TypeVar("T")
 
+
 def get_subsampling(clip: vs.VideoNode) -> str:
     """
     Returns the subsampling of a clip in human-readable format.
