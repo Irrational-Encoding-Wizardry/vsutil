@@ -17,6 +17,7 @@ class DiscoverTest(test):
         suite = unittest.TestLoader().discover(path, pattern="test_*.py")
         runner.run(suite)
 
+
 setup(
     name='vsutil',
     version='0.1.0',
