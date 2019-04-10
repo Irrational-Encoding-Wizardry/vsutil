@@ -1,4 +1,3 @@
-import os
 from setuptools import setup
 from setuptools.command.test import test
 
@@ -11,6 +10,7 @@ class DiscoverTest(test):
         self.test_suite = True
 
     def run_tests(self):
+        import os
         import unittest
         path = os.path.join(os.path.dirname(__file__), "tests")
         runner = unittest.TextTestRunner(verbosity=2)
