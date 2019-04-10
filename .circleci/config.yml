@@ -54,6 +54,7 @@ jobs:
           command: |
             . venv/bin/activate
             coverage report vsutil.py
+            coverage html --directory=test-results vsutil.py
             
       - store_test_results:
           path: test-results
