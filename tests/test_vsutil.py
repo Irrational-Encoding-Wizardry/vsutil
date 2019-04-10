@@ -12,8 +12,10 @@ class VsUtilTests(unittest.TestCase):
     YUV411P8_CLIP = vs.core.std.BlankClip(_format=vs.YUV411P8, width=160, height=120, color=[0, 128, 128], length=100)
     YUV440P8_CLIP = vs.core.std.BlankClip(_format=vs.YUV440P8, width=160, height=120, color=[0, 128, 128], length=100)
 
-    BLACK_SAMPLE_CLIP = vs.core.std.BlankClip(_format=vs.YUV420P8, width=160, height=120, color=[0, 128, 128], length=100)
-    WHITE_SAMPLE_CLIP = vs.core.std.BlankClip(_format=vs.YUV420P8, width=160, height=120, color=[255, 128, 128], length=100)
+    BLACK_SAMPLE_CLIP = vs.core.std.BlankClip(_format=vs.YUV420P8, width=160, height=120, color=[0, 128, 128],
+                                              length=100)
+    WHITE_SAMPLE_CLIP = vs.core.std.BlankClip(_format=vs.YUV420P8, width=160, height=120, color=[255, 128, 128],
+                                              length=100)
 
     def assert_same_dimensions(self, clip_a: vs.VideoNode, clip_b: vs.VideoNode):
         """
@@ -110,3 +112,8 @@ class VsUtilTests(unittest.TestCase):
         frame = self.WHITE_SAMPLE_CLIP.get_frame(0)
         clip = vsutil.frame2clip(frame)
         self.assert_same_frame(self.WHITE_SAMPLE_CLIP, clip)
+
+    def test_is_image(self):
+        """These are basically tests for the mime types, but I want the coverage. rooDerp"""
+        self.assertEqual(vsutil.is_image('something.png'), True)
+        self.assertEqual(vsutil.is_image('something.m2ts'), False)
