@@ -67,13 +67,10 @@ class VsUtilTests(unittest.TestCase):
         self.assertEqual('411', vsutil.get_subsampling(self.YUV411P8_CLIP))
         self.assertEqual('410', vsutil.get_subsampling(self.YUV410P8_CLIP))
         # let’s create a custom format with higher subsampling than any of the legal ones to test that branch as well:
-        try:
+        with self.assertRaises(ValueError):
             vsutil.get_subsampling(
                 vs.core.std.BlankClip(_format=self.YUV444P8_CLIP.format.replace(subsampling_w=4))
             )
-            self.fail("Should have failed.")
-        except ValueError:
-            pass
 
     def test_depth(self):
         self.assertEqual(8, vsutil.get_depth(self.YUV420P8_CLIP))
@@ -83,18 +80,12 @@ class VsUtilTests(unittest.TestCase):
         self.assertEqual((160, 120), vsutil.get_plane_size(self.YUV420P8_CLIP, 0))
         self.assertEqual((80, 60), vsutil.get_plane_size(self.YUV420P8_CLIP, 1))
         # these should fail because they don’t have a constant format or size
-        try:
+        with self.assertRaises(ValueError):
             vsutil.get_plane_size(
                 vs.core.std.Splice([self.BLACK_SAMPLE_CLIP, self.SMALLER_SAMPLE_CLIP], mismatch=True), 0)
-            self.fail("This should have failed.")
-        except ValueError:
-            pass
-        try:
+        with self.assertRaises(ValueError):
             vsutil.get_plane_size(
                 vs.core.std.Splice([self.YUV444P8_CLIP, self.YUV422P8_CLIP], mismatch=True), 0)
-            self.fail("This should have failed.")
-        except ValueError:
-            pass
 
     def test_insert_clip(self):
         inserted_middle = vsutil.insert_clip(self.BLACK_SAMPLE_CLIP, self.WHITE_SAMPLE_CLIP[:10], 50)
@@ -115,12 +106,8 @@ class VsUtilTests(unittest.TestCase):
         self.assert_same_metadata(self.BLACK_SAMPLE_CLIP, inserted_middle)
         self.assert_same_metadata(self.BLACK_SAMPLE_CLIP, inserted_end)
 
-        # this should fail
-        try:
+        with self.assertRaises(ValueError):
             vsutil.insert_clip(self.BLACK_SAMPLE_CLIP, self.BLACK_SAMPLE_CLIP, 90)
-            self.fail("This should have failed.")
-        except ValueError:
-            pass
 
     def test_fallback(self):
         self.assertEqual(vsutil.fallback(None, 'a value'), 'a value')
@@ -143,12 +130,14 @@ class VsUtilTests(unittest.TestCase):
         clip = vsutil.frame2clip(frame)
         self.assert_same_frame(self.WHITE_SAMPLE_CLIP, clip)
         # specifically test the path with disabled cache
-        vs.core.add_cache = False
-        black_frame = self.BLACK_SAMPLE_CLIP.get_frame(0)
-        black_clip = vsutil.frame2clip(black_frame, enforce_cache=True)
-        self.assert_same_frame(self.BLACK_SAMPLE_CLIP, black_clip)
+        try:
+            vs.core.add_cache = False
+            black_frame = self.BLACK_SAMPLE_CLIP.get_frame(0)
+            black_clip = vsutil.frame2clip(black_frame, enforce_cache=True)
+            self.assert_same_frame(self.BLACK_SAMPLE_CLIP, black_clip)
         # reset state of the core for further tests
-        vs.core.add_cache = True
+        finally:
+            vs.core.add_cache = True
 
     def test_is_image(self):
         """These are basically tests for the mime types, but I want the coverage. rooDerp"""
