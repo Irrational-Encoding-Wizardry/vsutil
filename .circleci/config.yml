@@ -36,6 +36,7 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install unittest-xml-reporting
+            pip install coverage
             pip install .
       - save_cache:
           paths:
@@ -46,7 +47,10 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            python -m xmlrunner discover -s ./tests -o test-results
+            coverage -m xmlrunner discover -s ./tests -o test-results
+            coverage report vsutil.py
+      - run:
+          name 
             
       - store_test_results:
           path: test-results
