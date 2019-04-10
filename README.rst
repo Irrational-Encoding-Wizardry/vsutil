@@ -1,4 +1,13 @@
-# vsutil
+vsutil
+------
+
+|codecov| |circleci|
+
+.. |circleci| image:: https://img.shields.io/circleci/project/github/Irrational-Encoding-Wizardry/vsutil.svg
+  :alt: CircleCI (all branches)
+.. |codecov| image:: https://img.shields.io/codecov/c/gh/Irrational-Encoding-Wizardry/vsutil.svg
+  :alt: Codecov
+
 A collection of general-purpose Vapoursynth functions to be reused in modules and scripts.
 
 The goal for vsutil is to allow authors of various "func" scripts to make use of premade helper functions instead of having to write their own. 
