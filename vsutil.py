@@ -140,10 +140,11 @@ def frame2clip(frame: vs.VideoFrame, *, enforce_cache=True) -> vs.VideoNode:
         fpsden=1,
         format=frame.format.id
     )
-    
+    frame = frame.copy()
+    result = bc.std.ModifyFrame([bc], lambda n, f: frame.copy())
+
     # Forcefully add a cache to Modify-Frame if caching is disabled on the core.
     # This will ensure that the filter will not include GIL characteristics.
-    result = bc.std.ModifyFrame([bc], lambda n, f: frame.copy())
     if not core.add_cache and enforce_cache:
         result = result.std.Cache(size=1, fixed=True)
     return result

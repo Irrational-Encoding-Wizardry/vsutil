@@ -1,11 +1,21 @@
-import os
 from setuptools import setup
+from setuptools.command.test import test
 
 
-def discover_tests():
-    import unittest
-    path = os.path.join(os.path.dirname(__file__), "tests")
-    return unittest.TestLoader().discover(path, pattern="test_*.py")
+class DiscoverTest(test):
+
+    def finalize_options(self):
+        test.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+
+    def run_tests(self):
+        import os
+        import unittest
+        path = os.path.join(os.path.dirname(__file__), "tests")
+        runner = unittest.TextTestRunner(verbosity=2)
+        suite = unittest.TestLoader().discover(path, pattern="test_*.py")
+        runner.run(suite)
 
 
 setup(
@@ -20,5 +30,7 @@ setup(
     install_requires=[
         "vapoursynth"
     ],
-    test_suite="setup.discover_tests"
+    cmdclass={
+        'test': DiscoverTest
+    }
 )
