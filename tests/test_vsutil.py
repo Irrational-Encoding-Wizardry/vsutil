@@ -47,12 +47,12 @@ class VsUtilTests(unittest.TestCase):
         self.assert_same_dimensions(clip_a, clip_b)
         self.assert_same_length(clip_a, clip_b)
 
-    def assert_same_frame(self, clip_a: vs.VideoNode, clip_b: vs.VideoNode):
+    def assert_same_frame(self, clip_a: vs.VideoNode, clip_b: vs.VideoNode, frameno: int = 0):
         """
         Assert that two frames are identical. Only the first frame of the arguments is used.
         """
         diff = vs.core.std.PlaneStats(clip_a, clip_b)
-        frame = diff.get_frame(0)
+        frame = diff.get_frame(frameno)
         self.assertEqual(frame.props.PlaneStatsDiff, 0)
 
     def test_subsampling(self):
@@ -105,3 +105,8 @@ class VsUtilTests(unittest.TestCase):
         planes = vsutil.split(self.BLACK_SAMPLE_CLIP)
         self.assertEqual(len(planes), 3)
         self.assert_same_metadata(self.BLACK_SAMPLE_CLIP, vsutil.join(planes))
+
+    def test_frame2clip(self):
+        frame = self.WHITE_SAMPLE_CLIP.get_frame(0)
+        clip = vsutil.frame2clip(frame)
+        self.assert_same_frame(self.WHITE_SAMPLE_CLIP, clip)

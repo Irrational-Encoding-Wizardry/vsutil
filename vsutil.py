@@ -139,6 +139,7 @@ def frame2clip(frame: vs.VideoFrame) -> vs.VideoNode:
         fpsden=1,
         format=frame.format.id
     )
+    frame = frame.copy()
 
     return bc.std.ModifyFrame([bc], lambda n, f: frame.copy())
 
