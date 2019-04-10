@@ -1,12 +1,19 @@
 vsutil
 ------
 
-|codecov| |circleci|
+|codecov| |circleci| |discord|
 
 .. |circleci| image:: https://img.shields.io/circleci/project/github/Irrational-Encoding-Wizardry/vsutil.svg
+  :target: https://circleci.com/gh/Irrational-Encoding-Wizardry/vsutil
   :alt: CircleCI (all branches)
+  
 .. |codecov| image:: https://img.shields.io/codecov/c/gh/Irrational-Encoding-Wizardry/vsutil.svg
+  :target: https://codecov.io/gh/Irrational-Encoding-Wizardry/vsutil
   :alt: Codecov
+  
+.. |discord| image:: https://img.shields.io/discord/221919789017202688.svg
+  :target: https://discord.gg/ZB7ZXbN
+  :alt: Discord
 
 A collection of general-purpose Vapoursynth functions to be reused in modules and scripts.
 
