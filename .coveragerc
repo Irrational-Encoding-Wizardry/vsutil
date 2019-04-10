@@ -1,3 +1,5 @@
 [report]
 fail_under=84
+
+[run]
 source=vsutil.py
