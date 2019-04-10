@@ -48,12 +48,12 @@ def get_plane_size(frame: Union[vs.VideoFrame, vs.VideoNode], planeno: int) -> T
     :return: (width, height)
     """
     # Add additional checks on Video Nodes as their size and format can be variable.
-    if isinstance(frame, vs.VideoNode):        
+    if isinstance(frame, vs.VideoNode):
         if frame.width == 0:
             raise ValueError("Cannot calculate plane size of variable size clip. Pass a frame instead.")
         if frame.format is None:
             raise ValueError("Cannot calculate plane size of variable format clip. Pass a frame instead.")
-        
+
     width, height = frame.width, frame.height
     if planeno != 0:
         width >>= frame.format.subsampling_w
@@ -65,7 +65,7 @@ def iterate(base: T, function: Callable[[T], T], count: int) -> T:
     """
     Utility function that executes a given function for a given number of times.
     """
-    return reduce(lambda v,_: function(v), range(count), base)
+    return reduce(lambda v, _: function(v), range(count), base)
 
 
 def insert_clip(clip: vs.VideoNode, insert: vs.VideoNode, start_frame: int) -> vs.VideoNode:
@@ -150,16 +150,15 @@ def frame2clip(frame: vs.VideoFrame, *, enforce_cache=True) -> vs.VideoNode:
     return result
 
 
-def get_w(height: int, aspect_ratio: float=16/9, only_even: bool=True) -> int:
+def get_w(height: int, aspect_ratio: float = 16 / 9, only_even: bool = True) -> int:
     """
     Calculates the width for a clip with the given height and aspect ratio.
     only_even is True by default because it imitates the math behind most standard resolutions (e.g. 854x480).
     """
     width = height * aspect_ratio
-    width = int(round(width))
     if only_even:
-        width = width // 2 * 2
-    return width
+        width = round(width / 2) * 2
+    return int(round(width))
 
 
 def is_image(filename: str) -> bool:
