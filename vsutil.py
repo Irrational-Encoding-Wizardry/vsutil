@@ -55,7 +55,8 @@ def is_vsscript():
     
     """
     if hasattr(vs, "vpy_current_environment"):
-        return vs.vpy_current_environment().is_single()
+        return not vs.Environment.is_single()
+
     else:
         return vs._using_vsscript
 
