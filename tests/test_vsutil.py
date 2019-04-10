@@ -12,6 +12,8 @@ class VsUtilTests(unittest.TestCase):
     YUV411P8_CLIP = vs.core.std.BlankClip(_format=vs.YUV411P8, width=160, height=120, color=[0, 128, 128], length=100)
     YUV440P8_CLIP = vs.core.std.BlankClip(_format=vs.YUV440P8, width=160, height=120, color=[0, 128, 128], length=100)
 
+    SMALLER_SAMPLE_CLIP = vs.core.std.BlankClip(_format=vs.YUV420P8, width=10, height=10)
+
     BLACK_SAMPLE_CLIP = vs.core.std.BlankClip(_format=vs.YUV420P8, width=160, height=120, color=[0, 128, 128],
                                               length=100)
     WHITE_SAMPLE_CLIP = vs.core.std.BlankClip(_format=vs.YUV420P8, width=160, height=120, color=[255, 128, 128],
@@ -64,6 +66,14 @@ class VsUtilTests(unittest.TestCase):
         self.assertEqual('422', vsutil.get_subsampling(self.YUV422P8_CLIP))
         self.assertEqual('411', vsutil.get_subsampling(self.YUV411P8_CLIP))
         self.assertEqual('410', vsutil.get_subsampling(self.YUV410P8_CLIP))
+        # let’s create a custom format with higher subsampling than any of the legal ones to test that branch as well:
+        try:
+            vsutil.get_subsampling(
+                vs.core.std.BlankClip(_format=self.YUV444P8_CLIP.format.replace(subsampling_w=4))
+            )
+            self.fail("Should have failed.")
+        except ValueError:
+            pass
 
     def test_depth(self):
         self.assertEqual(8, vsutil.get_depth(self.YUV420P8_CLIP))
@@ -72,6 +82,19 @@ class VsUtilTests(unittest.TestCase):
     def test_plane_size(self):
         self.assertEqual((160, 120), vsutil.get_plane_size(self.YUV420P8_CLIP, 0))
         self.assertEqual((80, 60), vsutil.get_plane_size(self.YUV420P8_CLIP, 1))
+        # these should fail because they don’t have a constant format or size
+        try:
+            vsutil.get_plane_size(
+                vs.core.std.Splice([self.BLACK_SAMPLE_CLIP, self.SMALLER_SAMPLE_CLIP], mismatch=True), 0)
+            self.fail("This should have failed.")
+        except ValueError:
+            pass
+        try:
+            vsutil.get_plane_size(
+                vs.core.std.Splice([self.YUV444P8_CLIP, self.YUV422P8_CLIP], mismatch=True), 0)
+            self.fail("This should have failed.")
+        except ValueError:
+            pass
 
     def test_insert_clip(self):
         inserted_middle = vsutil.insert_clip(self.BLACK_SAMPLE_CLIP, self.WHITE_SAMPLE_CLIP[:10], 50)
@@ -91,6 +114,13 @@ class VsUtilTests(unittest.TestCase):
         self.assert_same_metadata(self.BLACK_SAMPLE_CLIP, inserted_start)
         self.assert_same_metadata(self.BLACK_SAMPLE_CLIP, inserted_middle)
         self.assert_same_metadata(self.BLACK_SAMPLE_CLIP, inserted_end)
+
+        # this should fail
+        try:
+            vsutil.insert_clip(self.BLACK_SAMPLE_CLIP, self.BLACK_SAMPLE_CLIP, 90)
+            self.fail("This should have failed.")
+        except ValueError:
+            pass
 
     def test_fallback(self):
         self.assertEqual(vsutil.fallback(None, 'a value'), 'a value')
@@ -112,8 +142,28 @@ class VsUtilTests(unittest.TestCase):
         frame = self.WHITE_SAMPLE_CLIP.get_frame(0)
         clip = vsutil.frame2clip(frame)
         self.assert_same_frame(self.WHITE_SAMPLE_CLIP, clip)
+        # specifically test the path with disabled cache
+        vs.core.add_cache = False
+        black_frame = self.BLACK_SAMPLE_CLIP.get_frame(0)
+        black_clip = vsutil.frame2clip(black_frame, enforce_cache=True)
+        self.assert_same_frame(self.BLACK_SAMPLE_CLIP, black_clip)
+        # reset state of the core for further tests
+        vs.core.add_cache = True
 
     def test_is_image(self):
         """These are basically tests for the mime types, but I want the coverage. rooDerp"""
         self.assertEqual(vsutil.is_image('something.png'), True)
         self.assertEqual(vsutil.is_image('something.m2ts'), False)
+
+    def test_get_w(self):
+        self.assertEqual(vsutil.get_w(480, only_even=True), 854)
+        self.assertEqual(vsutil.get_w(480, only_even=False), 853)
+        self.assertEqual(vsutil.get_w(1080, 4 / 3), 1440)
+        self.assertEqual(vsutil.get_w(1080, 16 / 9), 1920)
+
+    def test_iterate(self):
+        def double_number(x: int) -> int:
+            return x * 2
+
+        self.assertEqual(vsutil.iterate(2, double_number, 3), 16)
+        self.assertEqual(vsutil.iterate(0, double_number, 4), 0)
