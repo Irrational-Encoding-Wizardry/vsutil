@@ -2,4 +2,5 @@
 fail_under=84
 
 [run]
-source=vsutil.py
+include
+    =vsutil.py
