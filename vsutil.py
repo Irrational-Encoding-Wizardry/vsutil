@@ -123,11 +123,12 @@ def join(planes: List[vs.VideoNode], family=vs.YUV) -> vs.VideoNode:
     return core.std.ShufflePlanes(clips=planes, planes=[0], colorfamily=family)
 
 
-def frame2clip(frame: vs.VideoFrame) -> vs.VideoNode:
+def frame2clip(frame: vs.VideoFrame, *, enforce_cache=True) -> vs.VideoNode:
     """
     Converts a vapoursynth frame to a clip.
     
-    :param frame: The frame to wrap.
+    :param frame:         The frame to wrap.
+    :param enforce_cache: Always add a cache. (Even if the vapoursynth module has this feature disabled)
     :returns:     A one-frame VideoNode that yields the frame passed to the function.
     """
     bc = core.std.BlankClip(
@@ -138,8 +139,13 @@ def frame2clip(frame: vs.VideoFrame) -> vs.VideoNode:
         fpsden=1,
         format=frame.format.id
     )
-
-    return bc.std.ModifyFrame([bc], lambda n, f: frame.copy())
+    
+    # Forcefully add a cache to Modify-Frame if caching is disabled on the core.
+    # This will ensure that the filter will not include GIL characteristics.
+    result = bc.std.ModifyFrame([bc], lambda n, f: frame.copy())
+    if not core.add_cache and enforce_cache:
+        result = result.std.Cache(size=1, fixed=True)
+    return result
 
 
 def get_w(height: int, aspect_ratio: float=16/9, only_even: bool=True) -> int:
