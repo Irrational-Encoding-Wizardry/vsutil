@@ -123,7 +123,7 @@ def join(planes: List[vs.VideoNode], family=vs.YUV) -> vs.VideoNode:
     return core.std.ShufflePlanes(clips=planes, planes=[0], colorfamily=family)
 
 
-def frame2clip(frame: vs.VideoFrame) -> vs.VideoNode
+def frame2clip(frame: vs.VideoFrame) -> vs.VideoNode:
     """
     Converts a vapoursynth frame to a clip.
     
