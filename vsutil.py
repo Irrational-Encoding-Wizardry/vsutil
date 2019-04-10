@@ -51,8 +51,9 @@ class VSThread(Thread):
 
 def is_vsscript():
     """
-    Since VSScript-VapourSynth behaves differently than
-    
+    Since VSScript-VapourSynth behaves differently than standalone,
+    you have to check whether you are running in vsscript mode.
+    (Which is actually the more used mode of both modes.)
     """
     if hasattr(vs, "vpy_current_environment"):
         return not vs.Environment.is_single()
