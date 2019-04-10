@@ -51,7 +51,9 @@ jobs:
 
       - run:
           name: verify coverage
-          command: coverage report vsutil.py
+          command: |
+            . venv/bin/activate
+            coverage report vsutil.py
             
       - store_test_results:
           path: test-results
