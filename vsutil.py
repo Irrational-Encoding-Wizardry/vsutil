@@ -32,8 +32,6 @@ class VSThread(Thread):
         self.environment = self._find_environment()
     
     def _find_environment(self):
-        
-            
         if not hasattr(vs, "vpy_current_environment"):
             if vs._using_vsscript:
                 raise EnvironmentError("Spawning threads is not supported in your version of VapourSynth")
