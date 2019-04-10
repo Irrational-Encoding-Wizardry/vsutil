@@ -48,9 +48,10 @@ jobs:
           command: |
             . venv/bin/activate
             coverage run -m xmlrunner discover -s ./tests -o test-results
-            coverage report vsutil.py
+
       - run:
-          name 
+          name: verify coverage
+          command: coverage report vsutil.py
             
       - store_test_results:
           path: test-results
