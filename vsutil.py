@@ -166,3 +166,12 @@ def is_image(filename: str) -> bool:
     Returns true if a filename refers to an image.
     """
     return mimetypes.types_map.get(os.path.splitext(filename)[-1], "").startswith("image/")
+
+
+def clip_sum(*clips: List[vs.VideoNode]) -> vs.VideoNode:
+    """
+    Concatenates all input clips.
+    """
+    if len(clips) == 1:
+        return clips[0]
+    return sum(clips[1:], clips[0])

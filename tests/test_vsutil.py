@@ -156,3 +156,8 @@ class VsUtilTests(unittest.TestCase):
 
         self.assertEqual(vsutil.iterate(2, double_number, 3), 16)
         self.assertEqual(vsutil.iterate(0, double_number, 4), 0)
+
+    def test_clip_sum(self):
+        self.assertEqual(len(vsutil.clip_sum(self.BLACK_SAMPLE_CLIP, self.BLACK_SAMPLE_CLIP)), len(self.BLACK_SAMPLE_CLIP) * 2)
+        self.assertEqual(len(vsutil.clip_sum(self.BLACK_SAMPLE_CLIP)), len(self.BLACK_SAMPLE_CLIP))
+        self.assert_same_frame(vsutil.clip_sum(self.BLACK_SAMPLE_CLIP, self.WHITE_SAMPLE_CLIP)[100], self.WHITE_SAMPLE_CLIP[0])
