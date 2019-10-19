@@ -166,3 +166,10 @@ def is_image(filename: str) -> bool:
     Returns true if a filename refers to an image.
     """
     return mimetypes.types_map.get(os.path.splitext(filename)[-1], "").startswith("image/")
+
+
+def is_luma_only(clip: vs.VideoNode) -> Bool:
+    """
+    Returns true if a clip has only one plane
+    """
+    return format.num_planes == 1
