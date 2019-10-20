@@ -172,4 +172,4 @@ def is_luma_only(clip: vs.VideoNode) -> Bool:
     """
     Returns true if a clip has only one plane
     """
-    return format.num_planes == 1
+    return clip.format.num_planes == 1
