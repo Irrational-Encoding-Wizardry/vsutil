@@ -162,8 +162,8 @@ def get_w(height: int, aspect_ratio: float = 16 / 9, only_even: bool = True) -> 
     """
     width = height * aspect_ratio
     if only_even:
-        width = round(width / 2) * 2
-    return int(round(width))
+        return round(width / 2) * 2
+    return round(width)
 
 
 def is_image(filename: str) -> bool:
