@@ -2,10 +2,11 @@
 VSUtil. A collection of general-purpose VapourSynth functions to be reused in modules and scripts.
 """
 from functools import reduce
-from typing import Callable, TypeVar, Union, List, Tuple, Optional
+from mimetypes import types_map
+from os import path
+from typing import Callable, List, Optional, Tuple, TypeVar, Union
+
 import vapoursynth as vs
-import mimetypes
-import os
 
 core = vs.core
 T = TypeVar("T")
@@ -168,4 +169,4 @@ def is_image(filename: str) -> bool:
     """
     Returns true if a filename refers to an image.
     """
-    return mimetypes.types_map.get(os.path.splitext(filename)[-1], "").startswith("image/")
+    return types_map.get(path.splitext(filename)[-1], "").startswith("image/")
