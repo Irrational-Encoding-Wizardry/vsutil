@@ -122,6 +122,9 @@ class VsUtilTests(unittest.TestCase):
         self.assert_same_dimensions(self.BLACK_SAMPLE_CLIP, y)
         self.assert_same_bitdepth(self.BLACK_SAMPLE_CLIP, y)
 
+        with self.assertRaisesRegex(ValueError, 'The clip must have a luma plane.'):
+            vsutil.get_y(self.RGB24_CLIP)
+
     def test_split_join(self):
         planes = vsutil.split(self.BLACK_SAMPLE_CLIP)
         self.assertEqual(len(planes), 3)

@@ -110,8 +110,8 @@ def get_y(clip: vs.VideoNode) -> vs.VideoNode:
     Helper to get the luma of a VideoNode.
     """
     if clip.format is None or clip.format.color_family not in (vs.YUV, vs.YCOCG):
-        raise ValueError("You did not pass a YUV-Clip into get_y.")
-        
+        raise ValueError('The clip must have a luma plane.')
+
     return plane(clip, 0)
 
 
