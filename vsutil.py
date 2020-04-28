@@ -1,5 +1,5 @@
 """
-VSUtil. A collection of general-purpose Vapoursynth functions to be reused in modules and scripts.
+VSUtil. A collection of general-purpose VapourSynth functions to be reused in modules and scripts.
 """
 from functools import reduce
 from typing import Callable, TypeVar, Union, List, Tuple, Optional
@@ -13,7 +13,7 @@ T = TypeVar("T")
 
 def get_subsampling(clip: vs.VideoNode) -> str:
     """
-    Returns the subsampling of a clip in human-readable format.
+    Returns the subsampling of a VideoNode in human-readable format.
     """
     if clip.format.subsampling_w == 1 and clip.format.subsampling_h == 1:
         css = '420'
@@ -34,25 +34,25 @@ def get_subsampling(clip: vs.VideoNode) -> str:
 
 def get_depth(clip: vs.VideoNode) -> int:
     """
-    Returns the bitdepth of a clip as an integer.
+    Returns the bit depth of a VideoNode as an integer.
     """
     return clip.format.bits_per_sample
 
 
 def get_plane_size(frame: Union[vs.VideoFrame, vs.VideoNode], planeno: int) -> Tuple[int, int]:
     """
-    Calculates the size of the plane
-    
-    :param frame:    The frame
-    :param planeno:  The plane
+    Calculates the dimensions (w, h) of the desired plane.
+
+    :param frame:    Can be a clip or frame.
+    :param planeno:  The desired plane's index.
     :return: (width, height)
     """
     # Add additional checks on Video Nodes as their size and format can be variable.
     if isinstance(frame, vs.VideoNode):
         if frame.width == 0:
-            raise ValueError("Cannot calculate plane size of variable size clip. Pass a frame instead.")
+            raise ValueError('Cannot calculate plane size of variable size clip. Pass a frame instead.')
         if frame.format is None:
-            raise ValueError("Cannot calculate plane size of variable format clip. Pass a frame instead.")
+            raise ValueError('Cannot calculate plane size of variable format clip. Pass a frame instead.')
 
     width, height = frame.width, frame.height
     if planeno != 0:
@@ -63,7 +63,7 @@ def get_plane_size(frame: Union[vs.VideoFrame, vs.VideoNode], planeno: int) -> T
 
 def iterate(base: T, function: Callable[[T], T], count: int) -> T:
     """
-    Utility function that executes a given function for a given number of times.
+    Utility function that executes a given function a given number of times.
     """
     return reduce(lambda v, _: function(v), range(count), base)
 
@@ -78,7 +78,7 @@ def insert_clip(clip: vs.VideoNode, insert: vs.VideoNode, start_frame: int) -> v
     pre = clip[:start_frame]
     frame_after_insert = start_frame + insert.num_frames
     if frame_after_insert > clip.num_frames:
-        raise ValueError('Inserted clip is too long')
+        raise ValueError('Inserted clip is too long.')
     if frame_after_insert == clip.num_frames:
         return pre + insert
     post = clip[start_frame + insert.num_frames:]
@@ -95,9 +95,9 @@ def fallback(value: Optional[T], fallback_value: T) -> T:
 def plane(clip: vs.VideoNode, planeno: int) -> vs.VideoNode:
     """
     Extract the plane with the given index from the clip.
-    
+
     :param clip:     The clip to extract the plane from.
-    :param planeno:  The planeno that specifies which plane to extract.
+    :param planeno:  The index that specifies which plane to extract.
     :return: A grayscale clip that only contains the given plane.
     """
     return core.std.ShufflePlanes(clip, planeno, vs.GRAY)
@@ -129,11 +129,11 @@ def join(planes: List[vs.VideoNode], family=vs.YUV) -> vs.VideoNode:
 
 def frame2clip(frame: vs.VideoFrame, *, enforce_cache=True) -> vs.VideoNode:
     """
-    Converts a vapoursynth frame to a clip.
-    
+    Converts a VapourSynth frame to a clip.
+
     :param frame:         The frame to wrap.
     :param enforce_cache: Always add a cache. (Even if the vapoursynth module has this feature disabled)
-    :returns:     A one-frame VideoNode that yields the frame passed to the function.
+    :return: A one-frame VideoNode that yields the frame passed to the function.
     """
     bc = core.std.BlankClip(
         width=frame.width,
