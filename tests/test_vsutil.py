@@ -11,6 +11,7 @@ class VsUtilTests(unittest.TestCase):
     YUV410P8_CLIP = vs.core.std.BlankClip(format=vs.YUV410P8, width=160, height=120, color=[0, 128, 128], length=100)
     YUV411P8_CLIP = vs.core.std.BlankClip(format=vs.YUV411P8, width=160, height=120, color=[0, 128, 128], length=100)
     YUV440P8_CLIP = vs.core.std.BlankClip(format=vs.YUV440P8, width=160, height=120, color=[0, 128, 128], length=100)
+    RGB24_CLIP = vs.core.std.BlankClip(format=vs.RGB24)
 
     SMALLER_SAMPLE_CLIP = vs.core.std.BlankClip(format=vs.YUV420P8, width=10, height=10)
 
@@ -66,8 +67,9 @@ class VsUtilTests(unittest.TestCase):
         self.assertEqual('422', vsutil.get_subsampling(self.YUV422P8_CLIP))
         self.assertEqual('411', vsutil.get_subsampling(self.YUV411P8_CLIP))
         self.assertEqual('410', vsutil.get_subsampling(self.YUV410P8_CLIP))
+        self.assertEqual('', vsutil.get_subsampling(self.RGB24_CLIP))
         # let’s create a custom format with higher subsampling than any of the legal ones to test that branch as well:
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, 'Unknown subsampling.'):
             vsutil.get_subsampling(
                 vs.core.std.BlankClip(_format=self.YUV444P8_CLIP.format.replace(subsampling_w=4))
             )

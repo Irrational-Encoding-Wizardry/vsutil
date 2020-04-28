@@ -16,21 +16,22 @@ def get_subsampling(clip: vs.VideoNode) -> str:
     """
     Returns the subsampling of a VideoNode in human-readable format.
     """
+    if clip.format.color_family not in (vs.YUV, vs.YCOCG):
+        return ''
     if clip.format.subsampling_w == 1 and clip.format.subsampling_h == 1:
-        css = '420'
+        return '420'
     elif clip.format.subsampling_w == 1 and clip.format.subsampling_h == 0:
-        css = '422'
+        return '422'
     elif clip.format.subsampling_w == 0 and clip.format.subsampling_h == 0:
-        css = '444'
+        return '444'
     elif clip.format.subsampling_w == 2 and clip.format.subsampling_h == 2:
-        css = '410'
+        return '410'
     elif clip.format.subsampling_w == 2 and clip.format.subsampling_h == 0:
-        css = '411'
+        return '411'
     elif clip.format.subsampling_w == 0 and clip.format.subsampling_h == 1:
-        css = '440'
+        return '440'
     else:
-        raise ValueError('Unknown subsampling')
-    return css
+        raise ValueError('Unknown subsampling.')
 
 
 def get_depth(clip: vs.VideoNode) -> int:
