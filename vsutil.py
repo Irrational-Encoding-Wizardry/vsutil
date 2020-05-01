@@ -1,6 +1,9 @@
 """
 VSUtil. A collection of general-purpose VapourSynth functions to be reused in modules and scripts.
 """
+__all__ = ['core', 'fallback', 'frame2clip', 'get_depth', 'get_plane_size', 'get_subsampling', 'get_w', 'get_y',
+           'insert_clip', 'is_image', 'iterate', 'join', 'plane', 'split', 'vs']
+
 from functools import reduce
 from mimetypes import types_map
 from os import path
