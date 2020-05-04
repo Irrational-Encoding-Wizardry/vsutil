@@ -12,7 +12,7 @@ from typing import Callable, List, Optional, Tuple, TypeVar, Union
 import vapoursynth as vs
 
 core = vs.core
-T = TypeVar("T")
+T = TypeVar('T')
 
 
 def get_subsampling(clip: vs.VideoNode) -> str:
@@ -173,4 +173,4 @@ def is_image(filename: str) -> bool:
     """
     Returns true if a filename refers to an image.
     """
-    return types_map.get(path.splitext(filename)[-1], "").startswith("image/")
+    return types_map.get(path.splitext(filename)[-1], '').startswith('image/')
