@@ -15,12 +15,13 @@ core = vs.core
 T = TypeVar('T')
 
 
-def get_subsampling(clip: vs.VideoNode) -> str:
+def get_subsampling(clip: vs.VideoNode) -> Union[None, str]:
     """
     Returns the subsampling of a VideoNode in human-readable format.
+    Returns None for formats without subsampling.
     """
     if clip.format.color_family not in (vs.YUV, vs.YCOCG):
-        return ''
+        return None
     if clip.format.subsampling_w == 1 and clip.format.subsampling_h == 1:
         return '420'
     elif clip.format.subsampling_w == 1 and clip.format.subsampling_h == 0:

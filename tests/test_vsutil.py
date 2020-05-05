@@ -67,7 +67,7 @@ class VsUtilTests(unittest.TestCase):
         self.assertEqual('422', vsutil.get_subsampling(self.YUV422P8_CLIP))
         self.assertEqual('411', vsutil.get_subsampling(self.YUV411P8_CLIP))
         self.assertEqual('410', vsutil.get_subsampling(self.YUV410P8_CLIP))
-        self.assertEqual('', vsutil.get_subsampling(self.RGB24_CLIP))
+        self.assertEqual(None, vsutil.get_subsampling(self.RGB24_CLIP))
         # let’s create a custom format with higher subsampling than any of the legal ones to test that branch as well:
         with self.assertRaisesRegex(ValueError, 'Unknown subsampling.'):
             vsutil.get_subsampling(
