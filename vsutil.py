@@ -7,7 +7,7 @@ __all__ = ['core', 'fallback', 'frame2clip', 'get_depth', 'get_plane_size', 'get
 from functools import reduce
 from mimetypes import types_map
 from os import path
-from typing import Callable, List, Optional, Tuple, TypeVar, Union
+from typing import Callable, List, Literal, Optional, Tuple, TypeVar, Union
 
 import vapoursynth as vs
 
@@ -15,7 +15,7 @@ core = vs.core
 T = TypeVar('T')
 
 
-def get_subsampling(clip: vs.VideoNode) -> Union[None, str]:
+def get_subsampling(clip: vs.VideoNode, /) -> Union[None, str]:
     """
     Returns the subsampling of a VideoNode in human-readable format.
     Returns None for formats without subsampling.
@@ -38,14 +38,14 @@ def get_subsampling(clip: vs.VideoNode) -> Union[None, str]:
         raise ValueError('Unknown subsampling.')
 
 
-def get_depth(clip: vs.VideoNode) -> int:
+def get_depth(clip: vs.VideoNode, /) -> int:
     """
     Returns the bit depth of a VideoNode as an integer.
     """
     return clip.format.bits_per_sample
 
 
-def get_plane_size(frame: Union[vs.VideoFrame, vs.VideoNode], planeno: int) -> Tuple[int, int]:
+def get_plane_size(frame: Union[vs.VideoFrame, vs.VideoNode], /, planeno: int) -> Tuple[int, int]:
     """
     Calculates the dimensions (w, h) of the desired plane.
 
@@ -53,7 +53,7 @@ def get_plane_size(frame: Union[vs.VideoFrame, vs.VideoNode], planeno: int) -> T
     :param planeno:  The desired plane's index.
     :return: (width, height)
     """
-    # Add additional checks on Video Nodes as their size and format can be variable.
+    # Add additional checks on VideoNodes as their size and format can be variable.
     if isinstance(frame, vs.VideoNode):
         if frame.width == 0:
             raise ValueError('Cannot calculate plane size of variable size clip. Pass a frame instead.')
@@ -74,7 +74,7 @@ def iterate(base: T, function: Callable[[T], T], count: int) -> T:
     return reduce(lambda v, _: function(v), range(count), base)
 
 
-def insert_clip(clip: vs.VideoNode, insert: vs.VideoNode, start_frame: int) -> vs.VideoNode:
+def insert_clip(clip: vs.VideoNode, /, insert: vs.VideoNode, start_frame: int) -> vs.VideoNode:
     """
     Convenience method to insert a shorter clip into a longer one.
     The inserted clip cannot go beyond the last frame of the source clip or an exception is raised.
@@ -98,7 +98,7 @@ def fallback(value: Optional[T], fallback_value: T) -> T:
     return fallback_value if value is None else value
 
 
-def plane(clip: vs.VideoNode, planeno: int) -> vs.VideoNode:
+def plane(clip: vs.VideoNode, planeno: int, /) -> vs.VideoNode:
     """
     Extract the plane with the given index from the clip.
 
@@ -109,7 +109,7 @@ def plane(clip: vs.VideoNode, planeno: int) -> vs.VideoNode:
     return core.std.ShufflePlanes(clip, planeno, vs.GRAY)
 
 
-def get_y(clip: vs.VideoNode) -> vs.VideoNode:
+def get_y(clip: vs.VideoNode, /) -> vs.VideoNode:
     """
     Helper to get the luma of a VideoNode.
     """
@@ -119,21 +119,21 @@ def get_y(clip: vs.VideoNode) -> vs.VideoNode:
     return plane(clip, 0)
 
 
-def split(clip: vs.VideoNode) -> List[vs.VideoNode]:
+def split(clip: vs.VideoNode, /) -> List[vs.VideoNode]:
     """
     Returns a list of planes for the given input clip.
     """
     return [plane(clip, x) for x in range(clip.format.num_planes)]
 
 
-def join(planes: List[vs.VideoNode], family=vs.YUV) -> vs.VideoNode:
+def join(planes: List[vs.VideoNode], family: Literal[vs.RGB, vs.YUV, vs.YCOCG] = vs.YUV) -> vs.VideoNode:
     """
-    Joins the supplied list of planes into a YUV video node.
+    Joins the supplied list of planes into a three-plane VideoNode (defaults to YUV).
     """
     return core.std.ShufflePlanes(clips=planes, planes=[0, 0, 0], colorfamily=family)
 
 
-def frame2clip(frame: vs.VideoFrame, *, enforce_cache=True) -> vs.VideoNode:
+def frame2clip(frame: vs.VideoFrame, /, *, enforce_cache=True) -> vs.VideoNode:
     """
     Converts a VapourSynth frame to a clip.
 
@@ -159,7 +159,7 @@ def frame2clip(frame: vs.VideoFrame, *, enforce_cache=True) -> vs.VideoNode:
     return result
 
 
-def get_w(height: int, aspect_ratio: float = 16 / 9, only_even: bool = True) -> int:
+def get_w(height: int, /, aspect_ratio: float = 16 / 9, *, only_even: bool = True) -> int:
     """
     Calculates the width for a clip with the given height and aspect ratio.
     only_even is True by default because it imitates the math behind most standard resolutions (e.g. 854x480).
@@ -170,7 +170,7 @@ def get_w(height: int, aspect_ratio: float = 16 / 9, only_even: bool = True) -> 
     return round(width)
 
 
-def is_image(filename: str) -> bool:
+def is_image(filename: str, /) -> bool:
     """
     Returns true if a filename refers to an image.
     """
