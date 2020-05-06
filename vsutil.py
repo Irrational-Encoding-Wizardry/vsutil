@@ -130,7 +130,7 @@ def join(planes: List[vs.VideoNode], family=vs.YUV) -> vs.VideoNode:
     """
     Joins the supplied list of planes into a YUV video node.
     """
-    return core.std.ShufflePlanes(clips=planes, planes=[0], colorfamily=family)
+    return core.std.ShufflePlanes(clips=planes, planes=[0, 0, 0], colorfamily=family)
 
 
 def frame2clip(frame: vs.VideoFrame, *, enforce_cache=True) -> vs.VideoNode:
