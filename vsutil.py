@@ -126,7 +126,8 @@ def split(clip: vs.VideoNode, /) -> List[vs.VideoNode]:
     return [plane(clip, x) for x in range(clip.format.num_planes)]
 
 
-def join(planes: List[vs.VideoNode], family: Literal[vs.RGB, vs.YUV, vs.YCOCG] = vs.YUV) -> vs.VideoNode:
+def join(planes: List[vs.VideoNode],
+         family: Literal[vs.ColorFamily.RGB, vs.ColorFamily.YUV, vs.ColorFamily.YCOCG] = vs.YUV) -> vs.VideoNode:
     """
     Joins the supplied list of planes into a three-plane VideoNode (defaults to YUV).
     """
