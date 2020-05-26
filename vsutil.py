@@ -160,7 +160,7 @@ def frame2clip(frame: vs.VideoFrame, /, *, enforce_cache=True) -> vs.VideoNode:
     return result
 
 
-def get_w(height: int, /, aspect_ratio: float = 16 / 9, *, only_even: bool = True) -> int:
+def get_w(height: int, aspect_ratio: float = 16 / 9, *, only_even: bool = True) -> int:
     """
     Calculates the width for a clip with the given height and aspect ratio.
     only_even is True by default because it imitates the math behind most standard resolutions (e.g. 854x480).
