@@ -125,6 +125,11 @@ class VsUtilTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'The clip must have a luma plane.'):
             vsutil.get_y(self.RGB24_CLIP)
 
+    def test_plane(self):
+        y = vs.core.std.BlankClip(format=vs.GRAY8)
+        # This should be a no-op, and even the clip reference shouldn’t change
+        self.assertEqual(y, vsutil.plane(y, 0))
+
     def test_split_join(self):
         planes = vsutil.split(self.BLACK_SAMPLE_CLIP)
         self.assertEqual(len(planes), 3)
