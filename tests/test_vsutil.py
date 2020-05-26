@@ -74,7 +74,7 @@ class VsUtilTests(unittest.TestCase):
                 vs.core.std.BlankClip(_format=self.YUV444P8_CLIP.format.replace(subsampling_w=4))
             )
 
-    def test_depth(self):
+    def test_get_depth(self):
         self.assertEqual(8, vsutil.get_depth(self.YUV420P8_CLIP))
         self.assertEqual(10, vsutil.get_depth(self.YUV420P10_CLIP))
 
@@ -166,3 +166,41 @@ class VsUtilTests(unittest.TestCase):
 
         self.assertEqual(vsutil.iterate(2, double_number, 3), 16)
         self.assertEqual(vsutil.iterate(0, double_number, 4), 0)
+
+    def test_depth(self):  # TODO: test dither/range/range_in logic
+        with self.assertRaisesRegex(ValueError, 'sample_type must be in'):
+            vsutil.depth(self.RGB24_CLIP, 8, sample_type=2)
+        with self.assertRaisesRegex(ValueError, 'range must be in'):
+            vsutil.depth(self.RGB24_CLIP, 8, range=2)
+        with self.assertRaisesRegex(ValueError, 'range_in must be in'):
+            vsutil.depth(self.RGB24_CLIP, 8, range_in=2)
+        with self.assertRaisesRegex(ValueError, 'dither_type must be in'):
+            vsutil.depth(self.RGB24_CLIP, 8, dither_type='test')
+
+        full_clip = vs.core.std.BlankClip(format=vs.RGB24)
+        int_10_clip = full_clip.resize.Point(format=full_clip.format.replace(bits_per_sample=10))
+        int_16_clip = full_clip.resize.Point(format=full_clip.format.replace(bits_per_sample=16))
+        float_16_clip = full_clip.resize.Point(format=full_clip.format.replace(bits_per_sample=16, sample_type=vs.FLOAT))
+        float_32_clip = full_clip.resize.Point(format=full_clip.format.replace(bits_per_sample=32, sample_type=vs.FLOAT))
+
+        limited_clip = vs.core.std.BlankClip(format=vs.YUV420P8)
+        l_int_10_clip = limited_clip.resize.Point(format=limited_clip.format.replace(bits_per_sample=10))
+        l_int_16_clip = limited_clip.resize.Point(format=limited_clip.format.replace(bits_per_sample=16))
+        l_float_16_clip = limited_clip.resize.Point(format=limited_clip.format.replace(bits_per_sample=16, sample_type=vs.FLOAT))
+        l_float_32_clip = limited_clip.resize.Point(format=limited_clip.format.replace(bits_per_sample=32, sample_type=vs.FLOAT))
+
+        self.assertEqual(vsutil.depth(full_clip, 8), full_clip)
+        self.assert_same_format(vsutil.depth(full_clip, 10), int_10_clip)
+        self.assert_same_format(vsutil.depth(full_clip, 16), int_16_clip)
+        self.assert_same_format(vsutil.depth(full_clip, 16, sample_type=vs.FLOAT), float_16_clip)
+        self.assert_same_format(vsutil.depth(full_clip, 32), float_32_clip)
+
+        self.assert_same_format(vsutil.depth(float_16_clip, 16, sample_type=vs.INTEGER), int_16_clip)
+
+        self.assertEqual(vsutil.depth(limited_clip, 8), limited_clip)
+        self.assert_same_format(vsutil.depth(limited_clip, 10), l_int_10_clip)
+        self.assert_same_format(vsutil.depth(limited_clip, 16), l_int_16_clip)
+        self.assert_same_format(vsutil.depth(limited_clip, 16, sample_type=vs.FLOAT), l_float_16_clip)
+        self.assert_same_format(vsutil.depth(limited_clip, 32), l_float_32_clip)
+
+        self.assert_same_format(vsutil.depth(l_float_16_clip, 16, sample_type=vs.INTEGER), l_int_16_clip)

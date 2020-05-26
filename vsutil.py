@@ -1,9 +1,10 @@
 """
 VSUtil. A collection of general-purpose VapourSynth functions to be reused in modules and scripts.
 """
-__all__ = ['core', 'fallback', 'frame2clip', 'get_depth', 'get_plane_size', 'get_subsampling', 'get_w', 'get_y',
-           'insert_clip', 'is_image', 'iterate', 'join', 'plane', 'split', 'vs']
+__all__ = ['Dither', 'Range', 'core', 'depth', 'fallback', 'frame2clip', 'get_depth', 'get_plane_size',
+           'get_subsampling', 'get_w', 'get_y', 'insert_clip', 'is_image', 'iterate', 'join', 'plane', 'split', 'vs']
 
+from enum import Enum, IntEnum
 from functools import reduce
 from mimetypes import types_map
 from os import path
@@ -13,6 +14,24 @@ import vapoursynth as vs
 
 core = vs.core
 T = TypeVar('T')
+
+
+class Range(IntEnum):
+    """
+    enum for zimg_pixel_range_e
+    """
+    LIMITED = 0  # Studio (TV) legal range, 16-235 in 8 bits.
+    FULL =    1  # Full (PC) dynamic range, 0-255 in 8 bits.
+
+
+class Dither(Enum):
+    """
+    enum for zimg_dither_type_e
+    """
+    NONE =            'none'             # Round to nearest.
+    ORDERED =         'ordered'          # Bayer patterned dither.
+    RANDOM =          'random'           # Pseudo-random noise of magnitude 0.5.
+    ERROR_DIFFUSION = 'error_diffusion'  # Floyd-Steinberg error diffusion.
 
 
 def get_subsampling(clip: vs.VideoNode, /) -> Union[None, str]:
@@ -179,3 +198,75 @@ def is_image(filename: str, /) -> bool:
     Returns true if a filename refers to an image.
     """
     return types_map.get(path.splitext(filename)[-1], '').startswith('image/')
+
+
+def depth(clip: vs.VideoNode,
+          bitdepth: int,
+          /,
+          sample_type: Optional[Union[int, vs.SampleType]] = None,
+          *,
+          range: Optional[Union[int, Range]] = None,
+          range_in: Optional[Union[int, Range]] = None,
+          dither_type: Optional[Union[Dither, str]] = None) \
+        -> vs.VideoNode:
+    """
+    A bit depth converter only using core.resize and Format.replace.
+    By default, outputs FLOAT sample type for 32 bit and INTEGER for anything else.
+
+    :param bitdepth:    Desired bits_per_sample of output clip.
+    :param sample_type: Desired sample_type of output clip. Allows overriding default FLOAT/INTEGER behavior. Accepts
+                        vapoursynth.SampleType enums INTEGER and FLOAT or their values, [0, 1].
+    :param range:       Output pixel range (defaults to input clip's range). See `Range`.
+    :param range_in:    Input pixel range (defaults to input clip's range). See `Range`.
+    :param dither_type: Dithering algorithm. Allows overriding default dithering behavior. See `Dither`.
+        Defaults to Floyd-Steinberg error diffusion when downsampling, converting between ranges, or upsampling full
+        range input. Defaults to 'none', or round to nearest, otherwise.
+
+    :return: Converted clip with desired bit depth and sample type. ColorFamily will be same as input.
+    """
+    def readable_enums(enum, module: str = 'vsutil') -> list:
+        """
+        Returns a readable error message listing all possible values in `module.enum`.
+        """
+        return [module + "." + str(i) for i in enum] + [i.value for i in enum]
+
+    # enum mapping and error checking
+    if sample_type is not None:
+        try:
+            sample_type = vs.SampleType(sample_type)
+        except ValueError:
+            raise ValueError(f'depth: sample_type must be in {readable_enums(vs.SampleType, str(vs.__name__))}.') from None
+    if range is not None:
+        try:
+            range = Range(range)
+        except ValueError:
+            raise ValueError(f'depth: range must be in {readable_enums(Range)}.') from None
+    if range_in is not None:
+        try:
+            range_in = Range(range_in)
+        except ValueError:
+            raise ValueError(f'depth: range_in must be in {readable_enums(Range)}.') from None
+    if dither_type is not None:
+        try:
+            dither_type = Dither(dither_type)
+        except ValueError:
+            raise ValueError(f'depth: dither_type must be in {readable_enums(Dither)}.') from None
+
+    curr_depth = get_depth(clip)
+    if sample_type is None:
+        if bitdepth == 32:
+            sample_type = vs.FLOAT
+        else:
+            sample_type = vs.INTEGER
+
+    if (curr_depth, clip.format.sample_type, range_in) == (bitdepth, sample_type, range):
+        return clip
+
+    if dither_type is None:
+        if range_in != range or range_in == 1:  # thanks @Frechdachs for explaining this: 'you need dithering when raising
+            dither_type = Dither.ERROR_DIFFUSION  # the bitdepth of full range [or] converting between full and limited'
+        else:
+            dither_type = Dither.ERROR_DIFFUSION if curr_depth > bitdepth and sample_type == vs.INTEGER else Dither.NONE
+
+    return clip.resize.Point(format=clip.format.replace(bits_per_sample=bitdepth, sample_type=sample_type), range=range,
+                             range_in=range_in, dither_type=dither_type.value)
