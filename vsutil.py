@@ -106,16 +106,19 @@ def plane(clip: vs.VideoNode, planeno: int, /) -> vs.VideoNode:
     :param planeno:  The index that specifies which plane to extract.
     :return: A grayscale clip that only contains the given plane.
     """
+    if clip.format.num_planes == 1 and planeno == 0:
+        return clip
     return core.std.ShufflePlanes(clip, planeno, vs.GRAY)
 
 
 def get_y(clip: vs.VideoNode, /) -> vs.VideoNode:
     """
     Helper to get the luma of a VideoNode.
-    """
-    if clip.format is None or clip.format.color_family not in (vs.YUV, vs.YCOCG):
-        raise ValueError('The clip must have a luma plane.')
 
+    If passed a single-plane vs.GRAY clip, it is assumed to be the luma and returned (no-op).
+    """
+    if clip.format is None or clip.format.color_family not in (vs.YUV, vs.YCOCG, vs.GRAY):
+        raise ValueError('The clip must have a luma plane.')
     return plane(clip, 0)
 
 
