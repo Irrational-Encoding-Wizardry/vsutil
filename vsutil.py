@@ -4,7 +4,7 @@ VSUtil. A collection of general-purpose VapourSynth functions to be reused in mo
 __all__ = ['Dither', 'Range', 'core', 'depth', 'fallback', 'frame2clip', 'get_depth', 'get_plane_size',
            'get_subsampling', 'get_w', 'get_y', 'insert_clip', 'is_image', 'iterate', 'join', 'plane', 'split', 'vs']
 
-from enum import Enum, IntEnum
+from enum import Enum, EnumMeta, IntEnum
 from functools import reduce
 from mimetypes import types_map
 from os import path
@@ -224,33 +224,27 @@ def depth(clip: vs.VideoNode,
 
     :return: Converted clip with desired bit depth and sample type. ColorFamily will be same as input.
     """
-    def readable_enums(enum, module: str = 'vsutil') -> list:
-        """
-        Returns a readable error message listing all possible values in `module.enum`.
-        """
-        return [module + "." + str(i) for i in enum] + [i.value for i in enum]
 
-    # enum mapping and error checking
     if sample_type is not None:
         try:
             sample_type = vs.SampleType(sample_type)
         except ValueError:
-            raise ValueError(f'depth: sample_type must be in {readable_enums(vs.SampleType, str(vs.__name__))}.') from None
+            raise ValueError(f'depth: sample_type must be in {_readable_enums(vs.SampleType, str(vs.__name__))}.') from None
     if range is not None:
         try:
             range = Range(range)
         except ValueError:
-            raise ValueError(f'depth: range must be in {readable_enums(Range)}.') from None
+            raise ValueError(f'depth: range must be in {_readable_enums(Range)}.') from None
     if range_in is not None:
         try:
             range_in = Range(range_in)
         except ValueError:
-            raise ValueError(f'depth: range_in must be in {readable_enums(Range)}.') from None
+            raise ValueError(f'depth: range_in must be in {_readable_enums(Range)}.') from None
     if dither_type is not None:
         try:
             dither_type = Dither(dither_type)
         except ValueError:
-            raise ValueError(f'depth: dither_type must be in {readable_enums(Dither)}.') from None
+            raise ValueError(f'depth: dither_type must be in {_readable_enums(Dither)}.') from None
 
     curr_depth = get_depth(clip)
     sample_type = fallback(sample_type, vs.FLOAT if bitdepth == 32 else vs.INTEGER)
@@ -267,3 +261,11 @@ def depth(clip: vs.VideoNode,
 
     return clip.resize.Point(format=clip.format.replace(bits_per_sample=bitdepth, sample_type=sample_type), range=range,
                              range_in=range_in, dither_type=dither_type.value)
+
+
+def _readable_enums(enum: EnumMeta, module: str = 'vsutil') -> list:
+    """
+    Returns a list of all possible values in `module.enum`.
+    Extends the default `repr(enum.value)` behavior by prefixing the enum with the name of the module it belongs to.
+    """
+    return [f'<{module}.{str(e)}: {e.value}>' for e in enum]
