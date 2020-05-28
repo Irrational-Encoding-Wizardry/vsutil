@@ -204,3 +204,13 @@ class VsUtilTests(unittest.TestCase):
         self.assert_same_format(vsutil.depth(limited_clip, 32), l_float_32_clip)
 
         self.assert_same_format(vsutil.depth(l_float_16_clip, 16, sample_type=vs.INTEGER), l_int_16_clip)
+
+    def test_readable_enums(self):
+        self.assertEqual(vsutil._readable_enums(vsutil.Range), ['<vsutil.Range.LIMITED: 0>', '<vsutil.Range.FULL: 1>'])
+
+    def test_resolve_enum(self):
+        self.assertEqual(vsutil._resolve_enum(vsutil.Range, None, 'test'), None)
+        self.assertEqual(vsutil._resolve_enum(vs.SampleType, 0, 'test', vs.__name__), vs.SampleType(0))
+
+        with self.assertRaisesRegex(ValueError, 'vapoursynth.ColorFamily'):
+            vsutil._resolve_enum(vs.ColorFamily, 2, 'test', vs.__name__)
