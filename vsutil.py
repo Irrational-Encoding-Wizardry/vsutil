@@ -4,16 +4,17 @@ VSUtil. A collection of general-purpose VapourSynth functions to be reused in mo
 __all__ = ['Dither', 'Range', 'core', 'depth', 'fallback', 'frame2clip', 'get_depth', 'get_plane_size',
            'get_subsampling', 'get_w', 'get_y', 'insert_clip', 'is_image', 'iterate', 'join', 'plane', 'split', 'vs']
 
-from enum import Enum, EnumMeta, IntEnum
+from enum import Enum, IntEnum
 from functools import reduce
 from mimetypes import types_map
 from os import path
-from typing import Any, Callable, List, Literal, Optional, Tuple, TypeVar, Union
+from typing import Any, Callable, List, Literal, Optional, Tuple, Type, TypeVar, Union
 
 import vapoursynth as vs
 
 core = vs.core
 T = TypeVar('T')
+E = TypeVar('E', bound=Enum)
 
 
 class Range(IntEnum):
@@ -248,7 +249,7 @@ def depth(clip: vs.VideoNode,
                              dither_type=dither_type.value)
 
 
-def _readable_enums(enum: EnumMeta, module: str = 'vsutil') -> List[str]:
+def _readable_enums(enum: Type[Enum], module: str = 'vsutil') -> List[str]:
     """
     Returns a list of all possible values in `module.enum`.
     Extends the default `repr(enum.value)` behavior by prefixing the enum with the name of the module it belongs to.
@@ -256,7 +257,7 @@ def _readable_enums(enum: EnumMeta, module: str = 'vsutil') -> List[str]:
     return [f'<{module}.{str(e)}: {e.value}>' for e in enum]
 
 
-def _resolve_enum(enum: EnumMeta, value: Any, var_name: str, module: str = 'vsutil'):
+def _resolve_enum(enum: Type[E], value: Any, var_name: str, module: str = 'vsutil') -> Union[E, None]:
     """
     Attempts to evaluate `value` in `enum` if value is not None, otherwise returns None.
     Basically checks if a supplied enum value is valid and returns a readable error message
