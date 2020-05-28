@@ -262,10 +262,9 @@ def _resolve_enum(enum: EnumMeta, value: Any, var_name: str, module: str = 'vsut
     Basically checks if a supplied enum value is valid and returns a readable error message
     explaining the possible enum values if it isn't.
     """
-    if value is not None:
-        try:
-            return enum(value)
-        except ValueError:
-            raise ValueError(f'{var_name} must be in {_readable_enums(enum, module)}.') from None
-    else:
-        return value
+    if value is None:
+        return None
+    try:
+        return enum(value)
+    except ValueError:
+        raise ValueError(f'{var_name} must be in {_readable_enums(enum, module)}.') from None
