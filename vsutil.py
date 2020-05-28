@@ -259,8 +259,10 @@ def depth(clip: vs.VideoNode,
                      or (curr_depth > bitdepth and sample_type == vs.INTEGER))
     dither_type = fallback(dither_type, Dither.ERROR_DIFFUSION if should_dither else Dither.NONE)
 
-    return clip.resize.Point(format=clip.format.replace(bits_per_sample=bitdepth, sample_type=sample_type), range=range,
-                             range_in=range_in, dither_type=dither_type.value)
+    return clip.resize.Point(format=clip.format.replace(bits_per_sample=bitdepth, sample_type=sample_type),
+                             range=range,
+                             range_in=range_in,
+                             dither_type=dither_type.value)
 
 
 def _readable_enums(enum: EnumMeta, module: str = 'vsutil') -> list:
