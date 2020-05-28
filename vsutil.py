@@ -8,7 +8,7 @@ from enum import Enum, EnumMeta, IntEnum
 from functools import reduce
 from mimetypes import types_map
 from os import path
-from typing import Callable, List, Literal, Optional, Tuple, TypeVar, Union
+from typing import Any, Callable, List, Literal, Optional, Tuple, TypeVar, Union
 
 import vapoursynth as vs
 
@@ -224,27 +224,10 @@ def depth(clip: vs.VideoNode,
 
     :return: Converted clip with desired bit depth and sample type. ColorFamily will be same as input.
     """
-
-    if sample_type is not None:
-        try:
-            sample_type = vs.SampleType(sample_type)
-        except ValueError:
-            raise ValueError(f'depth: sample_type must be in {_readable_enums(vs.SampleType, str(vs.__name__))}.') from None
-    if range is not None:
-        try:
-            range = Range(range)
-        except ValueError:
-            raise ValueError(f'depth: range must be in {_readable_enums(Range)}.') from None
-    if range_in is not None:
-        try:
-            range_in = Range(range_in)
-        except ValueError:
-            raise ValueError(f'depth: range_in must be in {_readable_enums(Range)}.') from None
-    if dither_type is not None:
-        try:
-            dither_type = Dither(dither_type)
-        except ValueError:
-            raise ValueError(f'depth: dither_type must be in {_readable_enums(Dither)}.') from None
+    sample_type = _resolve_enum(vs.SampleType, sample_type, 'sample_type', vs.__name__)
+    range = _resolve_enum(Range, range, 'range')
+    range_in = _resolve_enum(Range, range_in, 'range_in')
+    dither_type = _resolve_enum(Dither, dither_type, 'dither_type')
 
     curr_depth = get_depth(clip)
     sample_type = fallback(sample_type, vs.FLOAT if bitdepth == 32 else vs.INTEGER)
@@ -271,3 +254,18 @@ def _readable_enums(enum: EnumMeta, module: str = 'vsutil') -> list:
     Extends the default `repr(enum.value)` behavior by prefixing the enum with the name of the module it belongs to.
     """
     return [f'<{module}.{str(e)}: {e.value}>' for e in enum]
+
+
+def _resolve_enum(enum: EnumMeta, value: Any, var_name: str, module: str = 'vsutil'):
+    """
+    Attempts to evaluate `value` in `enum` if value is not None, otherwise returns None.
+    Basically checks if a supplied enum value is valid and returns a readable error message
+    explaining the possible enum values if it isn't.
+    """
+    if value is not None:
+        try:
+            return enum(value)
+        except ValueError:
+            raise ValueError(f'depth: {var_name} must be in {_readable_enums(enum, module)}.') from None
+    else:
+        return value
