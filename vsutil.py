@@ -266,6 +266,6 @@ def _resolve_enum(enum: EnumMeta, value: Any, var_name: str, module: str = 'vsut
         try:
             return enum(value)
         except ValueError:
-            raise ValueError(f'depth: {var_name} must be in {_readable_enums(enum, module)}.') from None
+            raise ValueError(f'{var_name} must be in {_readable_enums(enum, module)}.') from None
     else:
         return value
