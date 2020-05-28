@@ -258,11 +258,12 @@ def depth(clip: vs.VideoNode,
     if (curr_depth, clip.format.sample_type, range_in) == (bitdepth, sample_type, range):
         return clip
 
-    if dither_type is None:
-        if range_in != range or range_in == 1:  # thanks @Frechdachs for explaining this: 'you need dithering when raising
-            dither_type = Dither.ERROR_DIFFUSION  # the bitdepth of full range [or] converting between full and limited'
-        else:
-            dither_type = Dither.ERROR_DIFFUSION if curr_depth > bitdepth and sample_type == vs.INTEGER else Dither.NONE
+    # thanks @Frechdachs for explaining this:
+    # 'you need dithering when raising the bitdepth of full range [or] converting between full and limited'
+    should_dither = (range_in != range
+                     or range_in == Range.FULL
+                     or (curr_depth > bitdepth and sample_type == vs.INTEGER))
+    dither_type = fallback(dither_type, Dither.ERROR_DIFFUSION if should_dither else Dither.NONE)
 
     return clip.resize.Point(format=clip.format.replace(bits_per_sample=bitdepth, sample_type=sample_type), range=range,
                              range_in=range_in, dither_type=dither_type.value)
