@@ -253,11 +253,7 @@ def depth(clip: vs.VideoNode,
             raise ValueError(f'depth: dither_type must be in {readable_enums(Dither)}.') from None
 
     curr_depth = get_depth(clip)
-    if sample_type is None:
-        if bitdepth == 32:
-            sample_type = vs.FLOAT
-        else:
-            sample_type = vs.INTEGER
+    sample_type = fallback(sample_type, vs.FLOAT if bitdepth == 32 else vs.INTEGER)
 
     if (curr_depth, clip.format.sample_type, range_in) == (bitdepth, sample_type, range):
         return clip
