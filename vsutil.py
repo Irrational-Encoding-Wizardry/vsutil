@@ -248,7 +248,7 @@ def depth(clip: vs.VideoNode,
                              dither_type=dither_type.value)
 
 
-def _readable_enums(enum: EnumMeta, module: str = 'vsutil') -> list:
+def _readable_enums(enum: EnumMeta, module: str = 'vsutil') -> List[str]:
     """
     Returns a list of all possible values in `module.enum`.
     Extends the default `repr(enum.value)` behavior by prefixing the enum with the name of the module it belongs to.
