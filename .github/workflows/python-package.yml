@@ -25,6 +25,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install VapourSynth
       run: |
+        sudo apt-get install python3.8-dev
+        
         git clone https://github.com/sekrit-twc/zimg.git --branch v2.9 --depth 1
         pushd zimg
         ./autogen.sh
