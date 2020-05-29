@@ -164,8 +164,12 @@ class VsUtilTests(unittest.TestCase):
         def double_number(x: int) -> int:
             return x * 2
 
-        self.assertEqual(vsutil.iterate(2, double_number, 3), 16)
-        self.assertEqual(vsutil.iterate(0, double_number, 4), 0)
+        self.assertEqual(vsutil.iterate(2, double_number, 0), 2)
+        self.assertEqual(vsutil.iterate(2, double_number, 1), double_number(2))
+        self.assertEqual(vsutil.iterate(2, double_number, 3), double_number(double_number(double_number(2))))
+
+        with self.assertRaisesRegex(ValueError, 'Count cannot be negative.'):
+            vsutil.iterate(2, double_number, -1)
 
     def test_depth(self):  # TODO: test dither/range/range_in logic
         with self.assertRaisesRegex(ValueError, 'sample_type must be in'):
