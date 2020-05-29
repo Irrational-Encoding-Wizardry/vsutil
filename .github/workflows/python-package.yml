@@ -27,7 +27,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install VapourSynth (Linux)
-      if: ${{ matrix.os == "ubuntu-latest" }}
+      if: matrix.os == "ubuntu-latest"
       run: |
         git clone https://github.com/sekrit-twc/zimg.git --branch v2.9 --depth 1
         pushd zimg
@@ -43,7 +43,7 @@ jobs:
         sudo make install
         popd
     - name: Install VapourSynth (Windows)
-      if: ${{ matrix.os == "windows-latest" }}
+      if: matrix.os == "windows-latest"
       run: |
         python -m pip install vapoursynth-portable
     - name: Install dependencies
