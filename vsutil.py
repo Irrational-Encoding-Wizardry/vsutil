@@ -1,8 +1,8 @@
 """
 VSUtil. A collection of general-purpose VapourSynth functions to be reused in modules and scripts.
 """
-__all__ = ['Dither', 'Range', 'core', 'depth', 'fallback', 'frame2clip', 'get_depth', 'get_plane_size',
-           'get_subsampling', 'get_w', 'get_y', 'insert_clip', 'is_image', 'iterate', 'join', 'plane', 'split', 'vs']
+__all__ = ['Dither', 'Range', 'depth', 'fallback', 'frame2clip', 'get_depth', 'get_plane_size',
+           'get_subsampling', 'get_w', 'get_y', 'insert_clip', 'is_image', 'iterate', 'join', 'plane', 'split']
 
 from enum import Enum, IntEnum
 from functools import reduce
@@ -11,8 +11,8 @@ from os import path
 from typing import Any, Callable, List, Literal, Optional, Tuple, Type, TypeVar, Union
 
 import vapoursynth as vs
-
 core = vs.core
+
 T = TypeVar('T')
 E = TypeVar('E', bound=Enum)
 
