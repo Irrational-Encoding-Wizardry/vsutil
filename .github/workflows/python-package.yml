@@ -11,7 +11,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -26,21 +25,44 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install VapourSynth (Linux)
+    - name: cache_vs_compilation
       if: matrix.os == 'ubuntu-latest'
+      uses: actions/cache@v2.0.0
+      with:
+        path: .deps/
+        key: deps-compile-${{ matrix.os }}-vs50
+      # An ordered list of keys to use for restoring the cache if no cache hit occurred for key
+    - name: Compile VapourSynth (Linux)
+      if: matrix.os == 'ubuntu-latest' && steps.cache_vs_compilation.outputs.cache-hit != 'true'
       run: |
+        mkdir .deps
+        pushd .deps
+        
         git clone https://github.com/sekrit-twc/zimg.git --branch v2.9 --depth 1
         pushd zimg
         ./autogen.sh
         ./configure --prefix=/usr
-        sudo make install
+        make
         popd
         
         git clone https://github.com/vapoursynth/vapoursynth.git --branch R50 --depth 1
         pushd vapoursynth
         ./autogen.sh
         ./configure --disable-vsscript --disable-python-module --prefix=/usr
+        make
+        popd
+        
+        popd
+    - name: Install VapourSynth Libs (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        pushd .deps
+        pushd zimg
         sudo make install
+        popd
+        pushd vapoursynth
+        sudo make install
+        popd
         popd
     - name: Install VapourSynth (Windows)
       if: matrix.os == 'windows-latest'
