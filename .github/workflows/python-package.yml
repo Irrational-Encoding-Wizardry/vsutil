@@ -25,19 +25,15 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install VapourSynth
       run: |
-        curl https://github.com/sekrit-twc/zimg/archive/v2.9.zip --output zimg-v2.9.zip
-        mkdir zimg
+        git https://github.com/sekrit-twc/zimg.git --branch v2.9 --depth 1
         pushd zimg
-        unzip ../zimg-v2.9.zip
         ./autogen.sh
         ./configure
         make install
         popd
         
-        curl https://github.com/vapoursynth/vapoursynth/archive/R50.zip --output vs-r50.zip
-        mkdir vs
+        git https://github.com/vapoursynth/vapoursynth.git --branch R50 --depth 1
         pushd vs
-        unzip ../vs-r50.zip
         ./autogen.sh
         ./configure
         make install
