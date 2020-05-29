@@ -29,14 +29,14 @@ jobs:
         pushd zimg
         ./autogen.sh
         ./configure
-        make install
+        sudo make install
         popd
         
         git clone https://github.com/vapoursynth/vapoursynth.git --branch R50 --depth 1
         pushd vs
         ./autogen.sh
         ./configure
-        make install
+        sudo make install
         popd
     - name: Install dependencies
       run: |
