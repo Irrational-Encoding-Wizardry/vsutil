@@ -23,6 +23,25 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Install VapourSynth
+      run: |
+        curl https://github.com/sekrit-twc/zimg/archive/v2.9.zip --output zimg-v2.9.zip
+        mkdir zimg
+        pushd zimg
+        unzip zimg-v2.9.zip
+        ./autogen.sh
+        ./configure
+        make install
+        popd
+        
+        curl https://github.com/vapoursynth/vapoursynth/archive/R50.zip --output vs-r50.zip
+        mkdir vs
+        pushd vs
+        unzip ../vs-r50.zip
+        ./autogen.sh
+        ./configure
+        make install
+        popd
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
