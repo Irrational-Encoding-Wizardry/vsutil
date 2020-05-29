@@ -34,8 +34,9 @@ jobs:
         key: deps-compile-${{ matrix.os }}-vs50
       # An ordered list of keys to use for restoring the cache if no cache hit occurred for key
     - name: Compile VapourSynth (Linux)
-      if: matrix.os == 'ubuntu-latest' && steps.cache_vs_compilation.outputs.cache-hit != true
+      if: matrix.os == 'ubuntu-latest'
       run: |
+        if [ -d .deps ]; then exit 0; fi;
         mkdir .deps
         pushd .deps
         
@@ -57,7 +58,7 @@ jobs:
         
         popd
     - name: Install VapourSynth Libs from cache (Linux)
-      if: matrix.os == 'ubuntu-latest' && steps.cache_vs_compilation.outputs.cache-hit == true
+      if: matrix.os == 'ubuntu-latest'
       run: |
         pushd .deps
         pushd zimg
