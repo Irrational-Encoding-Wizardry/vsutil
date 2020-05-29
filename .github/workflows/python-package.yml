@@ -78,4 +78,4 @@ jobs:
         pip install .
     - name: Running tests
       run: |
-        python setup.py test
+        python -m unittest discover
