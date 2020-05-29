@@ -25,9 +25,6 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install VapourSynth
       run: |
-        sudo apt-get install python3.8-dev
-        pip install cython
-        
         git clone https://github.com/sekrit-twc/zimg.git --branch v2.9 --depth 1
         pushd zimg
         ./autogen.sh
@@ -38,7 +35,7 @@ jobs:
         git clone https://github.com/vapoursynth/vapoursynth.git --branch R50 --depth 1
         pushd vapoursynth
         ./autogen.sh
-        ./configure
+        ./configure --disable-vsscript --disable-python-module
         sudo make install
         popd
     - name: Install dependencies
