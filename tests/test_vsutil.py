@@ -214,3 +214,7 @@ class VsUtilTests(unittest.TestCase):
 
         with self.assertRaisesRegex(ValueError, 'vapoursynth.ColorFamily'):
             vsutil._resolve_enum(vs.ColorFamily, 2, 'test', 'vapoursynth')
+            
+    def test_fail(self):
+        # TODO: Remove me after ci-stuff is written.
+        raise RuntimeError("Remove me once done.")
