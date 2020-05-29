@@ -33,7 +33,7 @@ jobs:
         popd
         
         git clone https://github.com/vapoursynth/vapoursynth.git --branch R50 --depth 1
-        pushd vs
+        pushd vapoursynth
         ./autogen.sh
         ./configure
         sudo make install
