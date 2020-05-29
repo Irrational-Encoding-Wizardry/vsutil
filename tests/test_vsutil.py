@@ -210,7 +210,7 @@ class VsUtilTests(unittest.TestCase):
 
     def test_resolve_enum(self):
         self.assertEqual(vsutil._resolve_enum(vsutil.Range, None, 'test'), None)
-        self.assertEqual(vsutil._resolve_enum(vs.SampleType, 0, 'test', vs.__name__), vs.SampleType(0))
+        self.assertEqual(vsutil._resolve_enum(vs.SampleType, 0, 'test'), vs.SampleType(0))
 
         with self.assertRaisesRegex(ValueError, 'vapoursynth.ColorFamily'):
-            vsutil._resolve_enum(vs.ColorFamily, 2, 'test', vs.__name__)
+            vsutil._resolve_enum(vs.ColorFamily, 2, 'test')

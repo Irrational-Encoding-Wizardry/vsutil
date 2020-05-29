@@ -225,7 +225,7 @@ def depth(clip: vs.VideoNode,
 
     :return: Converted clip with desired bit depth and sample type. ColorFamily will be same as input.
     """
-    sample_type = _resolve_enum(vs.SampleType, sample_type, 'sample_type', vs.__name__)
+    sample_type = _resolve_enum(vs.SampleType, sample_type, 'sample_type')
     range = _resolve_enum(Range, range, 'range')
     range_in = _resolve_enum(Range, range_in, 'range_in')
     dither_type = _resolve_enum(Dither, dither_type, 'dither_type')
@@ -249,15 +249,16 @@ def depth(clip: vs.VideoNode,
                              dither_type=dither_type.value)
 
 
-def _readable_enums(enum: Type[Enum], module: str = 'vsutil') -> List[str]:
+def _readable_enums(enum: Type[Enum]) -> List[str]:
     """
     Returns a list of all possible values in `module.enum`.
     Extends the default `repr(enum.value)` behavior by prefixing the enum with the name of the module it belongs to.
     """
+    module = 'vapoursynth' if 'importlib' in enum.__module__ else enum.__module__
     return [f'<{module}.{str(e)}: {e.value}>' for e in enum]
 
 
-def _resolve_enum(enum: Type[E], value: Any, var_name: str, module: str = 'vsutil') -> Union[E, None]:
+def _resolve_enum(enum: Type[E], value: Any, var_name: str) -> Union[E, None]:
     """
     Attempts to evaluate `value` in `enum` if value is not None, otherwise returns None.
     Basically checks if a supplied enum value is valid and returns a readable error message
@@ -268,4 +269,4 @@ def _resolve_enum(enum: Type[E], value: Any, var_name: str, module: str = 'vsuti
     try:
         return enum(value)
     except ValueError:
-        raise ValueError(f'{var_name} must be in {_readable_enums(enum, module)}.') from None
+        raise ValueError(f'{var_name} must be in {_readable_enums(enum)}.') from None
