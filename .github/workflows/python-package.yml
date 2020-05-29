@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         os:
-#          - ubuntu-latest
+          - ubuntu-latest
           - windows-latest
         python-version: [3.8]
 
@@ -32,14 +32,14 @@ jobs:
         git clone https://github.com/sekrit-twc/zimg.git --branch v2.9 --depth 1
         pushd zimg
         ./autogen.sh
-        ./configure
+        ./configure --prefix=/usr
         sudo make install
         popd
         
         git clone https://github.com/vapoursynth/vapoursynth.git --branch R50 --depth 1
         pushd vapoursynth
         ./autogen.sh
-        ./configure --disable-vsscript --disable-python-module
+        ./configure --disable-vsscript --disable-python-module --prefix=/usr
         sudo make install
         popd
     - name: Install VapourSynth (Windows)
