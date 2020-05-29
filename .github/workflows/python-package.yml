@@ -43,6 +43,7 @@ jobs:
         ./autogen.sh
         ./configure --prefix=/usr
         make
+        sudo make install
         popd
         
         git clone https://github.com/vapoursynth/vapoursynth.git --branch R50 --depth 1
@@ -50,11 +51,12 @@ jobs:
         ./autogen.sh
         ./configure --disable-vsscript --disable-python-module --prefix=/usr
         make
+        sudo make install
         popd
         
         popd
-    - name: Install VapourSynth Libs (Linux)
-      if: matrix.os == 'ubuntu-latest'
+    - name: Install VapourSynth Libs from cache (Linux)
+      if: matrix.os == 'ubuntu-latest' && steps.cache_vs_compilation.outputs.cache-hit == 'true'
       run: |
         pushd .deps
         pushd zimg
