@@ -25,14 +25,14 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install VapourSynth
       run: |
-        git https://github.com/sekrit-twc/zimg.git --branch v2.9 --depth 1
+        git clone https://github.com/sekrit-twc/zimg.git --branch v2.9 --depth 1
         pushd zimg
         ./autogen.sh
         ./configure
         make install
         popd
         
-        git https://github.com/vapoursynth/vapoursynth.git --branch R50 --depth 1
+        git clone https://github.com/vapoursynth/vapoursynth.git --branch R50 --depth 1
         pushd vs
         ./autogen.sh
         ./configure
