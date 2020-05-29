@@ -28,7 +28,7 @@ jobs:
         curl https://github.com/sekrit-twc/zimg/archive/v2.9.zip --output zimg-v2.9.zip
         mkdir zimg
         pushd zimg
-        unzip zimg-v2.9.zip
+        unzip ../zimg-v2.9.zip
         ./autogen.sh
         ./configure
         make install
