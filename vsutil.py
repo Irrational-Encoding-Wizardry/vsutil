@@ -5,7 +5,6 @@ __all__ = ['Dither', 'Range', 'core', 'depth', 'fallback', 'frame2clip', 'get_de
            'get_subsampling', 'get_w', 'get_y', 'insert_clip', 'is_image', 'iterate', 'join', 'plane', 'split', 'vs']
 
 from enum import Enum, IntEnum
-from functools import reduce
 from mimetypes import types_map
 from os import path
 from typing import Any, Callable, List, Literal, Optional, Tuple, Type, TypeVar, Union
@@ -15,6 +14,7 @@ import vapoursynth as vs
 core = vs.core
 T = TypeVar('T')
 E = TypeVar('E', bound=Enum)
+R = TypeVar('R')
 
 
 class Range(IntEnum):
@@ -87,11 +87,17 @@ def get_plane_size(frame: Union[vs.VideoFrame, vs.VideoNode], /, planeno: int) -
     return width, height
 
 
-def iterate(base: T, function: Callable[[T], T], count: int) -> T:
+def iterate(base: T, function: Callable[[Union[T, R]], R], count: int) -> Union[T, R]:
     """
     Utility function that executes a given function a given number of times.
     """
-    return reduce(lambda v, _: function(v), range(count), base)
+    if count < 0:
+        raise ValueError('Count cannot be negative.')
+
+    v: Union[T, R] = base
+    for _ in range(count):
+        v = function(v)
+    return v
 
 
 def insert_clip(clip: vs.VideoNode, /, insert: vs.VideoNode, start_frame: int) -> vs.VideoNode:
