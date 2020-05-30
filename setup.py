@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 from setuptools.command.test import test
 
 
@@ -21,7 +21,10 @@ class DiscoverTest(test):
 setup(
     name='vsutil',
     version='0.1.0',
-    py_modules=['vsutil'],
+    packages=find_packages(exclude=['tests']),
+    package_data={
+        'vsutil': ['py.typed']
+    },
     url='https://encode.moe/vsutil',
     license='MIT',
     author='kageru',
