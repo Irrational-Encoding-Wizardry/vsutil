@@ -218,3 +218,4 @@ class VsUtilTests(unittest.TestCase):
 
         with self.assertRaisesRegex(ValueError, 'vapoursynth.ColorFamily'):
             vsutil._resolve_enum(vs.ColorFamily, 2, 'test', 'vapoursynth')
+
