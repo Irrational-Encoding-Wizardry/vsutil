@@ -25,7 +25,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install VapourSynth
-      uses: 'Irrational-Encoding-Wizardry/install-vapoursynth-action'
+      uses: Irrational-Encoding-Wizardry/install-vapoursynth-action@master
       with:
         version: ${{ matrix.vs-version }}
         cache: true
