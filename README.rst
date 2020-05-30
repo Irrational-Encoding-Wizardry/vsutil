@@ -1,15 +1,11 @@
 vsutil
 ------
 
-|codecov| |circleci| |discord|
+|build| |discord|
 
-.. |circleci| image:: https://img.shields.io/circleci/project/github/Irrational-Encoding-Wizardry/vsutil.svg
-  :target: https://circleci.com/gh/Irrational-Encoding-Wizardry/vsutil
-  :alt: CircleCI (all branches)
-
-.. |codecov| image:: https://img.shields.io/codecov/c/gh/Irrational-Encoding-Wizardry/vsutil.svg
-  :target: https://codecov.io/gh/Irrational-Encoding-Wizardry/vsutil
-  :alt: Codecov
+.. |build| image:: https://github.com/Irrational-Encoding-Wizardry/vsutil/workflows/build/badge.svg
+  :target: https://github.com/Irrational-Encoding-Wizardry/vsutil/actions?query=workflow%3Abuild+
+  :alt: Build
 
 .. |discord| image:: https://img.shields.io/discord/221919789017202688.svg
   :target: https://discord.gg/ZB7ZXbN
