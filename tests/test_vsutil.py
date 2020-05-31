@@ -1,6 +1,6 @@
 import unittest
 import vapoursynth as vs
-from vsutil import vsutil
+import vsutil
 
 
 class VsUtilTests(unittest.TestCase):
