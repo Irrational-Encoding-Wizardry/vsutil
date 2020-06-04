@@ -2,7 +2,8 @@
 VSUtil. A collection of general-purpose VapourSynth functions to be reused in modules and scripts.
 """
 __all__ = ['Dither', 'Range', 'depth', 'fallback', 'frame2clip', 'get_depth', 'get_plane_size',
-           'get_subsampling', 'get_w', 'get_y', 'insert_clip', 'is_image', 'iterate', 'join', 'plane', 'split']
+           'get_subsampling', 'get_w', 'get_y', 'insert_clip', 'is_image', 'is_variable', 'iterate', 'join', 'plane',
+           'split']
 
 from enum import Enum, IntEnum
 from mimetypes import types_map
@@ -275,3 +276,21 @@ def _resolve_enum(enum: Type[E], value: Any, var_name: str, module: Optional[str
         return enum(value)
     except ValueError:
         raise ValueError(f'{var_name} must be in {_readable_enums(enum, module)}.') from None
+
+
+def is_variable(clip: vs.VideoNode, /, *, format: bool = False, resolution: bool = False) -> bool:
+    """
+    Returns True if at least one of the specified clip's attributes is variable.
+    It is an error to use this without specifying which attribute to check.
+    """
+    if not format and not resolution:
+        raise ValueError('At least one attribute must be specified as `True`.')
+
+    if format:
+        if clip.format is None:
+            return True
+    if resolution:
+        if 0 in (clip.width, clip.height):
+            return True
+
+    return False
