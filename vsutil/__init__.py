@@ -41,6 +41,7 @@ def get_subsampling(clip: vs.VideoNode, /) -> Union[None, str]:
     Returns the subsampling of a VideoNode in human-readable format.
     Returns None for formats without subsampling.
     """
+    _disallow_variable_format(clip)
     if clip.format.color_family not in (vs.YUV, vs.YCOCG):
         return None
     if clip.format.subsampling_w == 1 and clip.format.subsampling_h == 1:
@@ -63,6 +64,7 @@ def get_depth(clip: vs.VideoNode, /) -> int:
     """
     Returns the bit depth of a VideoNode as an integer.
     """
+    _disallow_variable_format(clip)
     return clip.format.bits_per_sample
 
 
@@ -133,6 +135,7 @@ def plane(clip: vs.VideoNode, planeno: int, /) -> vs.VideoNode:
     :param planeno:  The index that specifies which plane to extract.
     :return: A grayscale clip that only contains the given plane.
     """
+    _disallow_variable_format(clip)
     if clip.format.num_planes == 1 and planeno == 0:
         return clip
     return core.std.ShufflePlanes(clip, planeno, vs.GRAY)
@@ -153,6 +156,7 @@ def split(clip: vs.VideoNode, /) -> List[vs.VideoNode]:
     """
     Returns a list of planes for the given input clip.
     """
+    _disallow_variable_format(clip)
     return [plane(clip, x) for x in range(clip.format.num_planes)]
 
 
@@ -232,6 +236,7 @@ def depth(clip: vs.VideoNode,
 
     :return: Converted clip with desired bit depth and sample type. ColorFamily will be same as input.
     """
+    _disallow_variable_format(clip)
     sample_type = _resolve_enum(vs.SampleType, sample_type, 'sample_type', 'vapoursynth')
     range = _resolve_enum(Range, range, 'range')
     range_in = _resolve_enum(Range, range_in, 'range_in')
