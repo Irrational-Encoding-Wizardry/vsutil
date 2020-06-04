@@ -294,3 +294,13 @@ def is_variable(clip: vs.VideoNode, /, *, format: bool = False, resolution: bool
             return True
 
     return False
+
+
+def _disallow_variable_format(clip: vs.VideoNode, /) -> None:
+    if is_variable(clip, format=True):
+        raise ValueError('Variable-format clips not supported.')
+
+
+def _disallow_variable_resolution(clip: vs.VideoNode, /) -> None:
+    if is_variable(clip, resolution=True):
+        raise ValueError('Variable-resolution clips not supported.')
