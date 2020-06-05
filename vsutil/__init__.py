@@ -9,7 +9,7 @@ __all__ = ['Dither', 'Range', 'depth', 'disallow_variable_format', 'disallow_var
 from enum import Enum, IntEnum
 from mimetypes import types_map
 from os import path
-from typing import Any, Callable, List, Literal, Optional, Tuple, Type, TypeVar, Union, cast
+from typing import Any, Callable, List, Literal, Optional, Tuple, Type, TypeVar, Union
 
 import vapoursynth as vs
 core = vs.core
