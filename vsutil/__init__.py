@@ -3,7 +3,7 @@ VSUtil. A collection of general-purpose VapourSynth functions to be reused in mo
 """
 __all__ = ['Dither', 'Range', 'depth', 'disallow_variable_format', 'disallow_variable_resolution', 'fallback',
            'frame2clip', 'get_depth', 'get_plane_size',
-           'get_subsampling', 'get_w', 'get_y', 'insert_clip', 'is_image', 'is_variable', 'iterate', 'join', 'plane',
+           'get_subsampling', 'get_w', 'get_y', 'insert_clip', 'is_image', 'iterate', 'join', 'plane',
            'split']
 
 from enum import Enum, IntEnum
@@ -38,24 +38,6 @@ class Dither(Enum):
     ERROR_DIFFUSION = 'error_diffusion'  # Floyd-Steinberg error diffusion.
 
 
-def is_variable(clip: vs.VideoNode, /, *, format: bool = False, resolution: bool = False) -> bool:
-    """
-    Returns True if at least one of the specified clip's attributes is variable.
-    It is an error to use this without specifying which attribute to check.
-    """
-    if not format and not resolution:
-        raise ValueError('At least one attribute must be specified as `True`.')
-
-    if format:
-        if clip.format is None:
-            return True
-    if resolution:
-        if 0 in (clip.width, clip.height):
-            return True
-
-    return False
-
-
 def disallow_variable_format(function: Callable[..., R]) -> Callable[..., R]:
     """
     Function decorator that raises an exception if the input clip has a variable format.
@@ -63,7 +45,7 @@ def disallow_variable_format(function: Callable[..., R]) -> Callable[..., R]:
     """
     @wraps(function)
     def _check(clip: vs.VideoNode, *args, **kwargs) -> R:
-        if is_variable(clip, format=True):
+        if clip.format is None:
             raise ValueError('Variable-format clips not supported.')
         return function(clip, *args, **kwargs)
     return _check
@@ -76,7 +58,7 @@ def disallow_variable_resolution(function: Callable[..., R]) -> Callable[..., R]
     """
     @wraps(function)
     def _check(clip: vs.VideoNode, *args, **kwargs) -> R:
-        if is_variable(clip, resolution=True):
+        if 0 in (clip.width, clip.height):
             raise ValueError('Variable-resolution clips not supported.')
         return function(clip, *args, **kwargs)
     return _check
