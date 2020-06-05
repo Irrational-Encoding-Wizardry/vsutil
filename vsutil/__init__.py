@@ -59,6 +59,7 @@ def is_variable(clip: vs.VideoNode, /, *, format: bool = False, resolution: bool
 def disallow_variable_format(function: Callable[..., R]) -> Callable[..., R]:
     """
     Function decorator that raises an exception if the input clip has a variable format.
+    Decorated function's first parameter must be of type `vapoursynth.VideoNode` and is the only parameter checked.
     """
     @wraps(function)
     def _check(clip: vs.VideoNode, *args, **kwargs) -> R:
@@ -71,6 +72,7 @@ def disallow_variable_format(function: Callable[..., R]) -> Callable[..., R]:
 def disallow_variable_resolution(function: Callable[..., R]) -> Callable[..., R]:
     """
     Function decorator that raises an exception if the input clip has a variable resolution.
+    Decorated function's first parameter must be of type `vapoursynth.VideoNode` and is the only parameter checked.
     """
     @wraps(function)
     def _check(clip: vs.VideoNode, *args, **kwargs) -> R:
