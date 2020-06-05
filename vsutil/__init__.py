@@ -1,14 +1,15 @@
 """
 VSUtil. A collection of general-purpose VapourSynth functions to be reused in modules and scripts.
 """
-__all__ = ['Dither', 'Range', 'depth', 'fallback', 'frame2clip', 'get_depth', 'get_plane_size',
+__all__ = ['Dither', 'Range', 'depth', 'disallow_variable_format', 'disallow_variable_resolution', 'fallback',
+           'frame2clip', 'get_depth', 'get_plane_size',
            'get_subsampling', 'get_w', 'get_y', 'insert_clip', 'is_image', 'is_variable', 'iterate', 'join', 'plane',
            'split']
 
 from enum import Enum, IntEnum
 from mimetypes import types_map
 from os import path
-from typing import Any, Callable, List, Literal, Optional, Tuple, Type, TypeVar, Union
+from typing import Any, Callable, List, Literal, Optional, Tuple, Type, TypeVar, Union, cast
 
 import vapoursynth as vs
 core = vs.core
@@ -16,6 +17,7 @@ core = vs.core
 T = TypeVar('T')
 E = TypeVar('E', bound=Enum)
 R = TypeVar('R')
+C = TypeVar('C', bound=Callable)
 
 
 class Range(IntEnum):
@@ -36,12 +38,52 @@ class Dither(Enum):
     ERROR_DIFFUSION = 'error_diffusion'  # Floyd-Steinberg error diffusion.
 
 
+def is_variable(clip: vs.VideoNode, /, *, format: bool = False, resolution: bool = False) -> bool:
+    """
+    Returns True if at least one of the specified clip's attributes is variable.
+    It is an error to use this without specifying which attribute to check.
+    """
+    if not format and not resolution:
+        raise ValueError('At least one attribute must be specified as `True`.')
+
+    if format:
+        if clip.format is None:
+            return True
+    if resolution:
+        if 0 in (clip.width, clip.height):
+            return True
+
+    return False
+
+
+def disallow_variable_format(function: C) -> C:
+    """
+    Function decorator that raises an exception if the input clip has a variable format.
+    """
+    def _check(clip: vs.VideoNode, *args, **kwargs) -> C:
+        if is_variable(clip, format=True):
+            raise ValueError('Variable-format clips not supported.')
+        return function
+    return cast(C, _check)
+
+
+def disallow_variable_resolution(function: C) -> C:
+    """
+    Function decorator that raises an exception if the input clip has a variable resolution.
+    """
+    def _check(clip: vs.VideoNode, *args, **kwargs) -> C:
+        if is_variable(clip, resolution=True):
+            raise ValueError('Variable-format clips not supported.')
+        return function
+    return cast(C, _check)
+
+
+@disallow_variable_format
 def get_subsampling(clip: vs.VideoNode, /) -> Union[None, str]:
     """
     Returns the subsampling of a VideoNode in human-readable format.
     Returns None for formats without subsampling.
     """
-    _disallow_variable_format(clip)
     if clip.format.color_family not in (vs.YUV, vs.YCOCG):
         return None
     if clip.format.subsampling_w == 1 and clip.format.subsampling_h == 1:
@@ -60,11 +102,11 @@ def get_subsampling(clip: vs.VideoNode, /) -> Union[None, str]:
         raise ValueError('Unknown subsampling.')
 
 
+@disallow_variable_format
 def get_depth(clip: vs.VideoNode, /) -> int:
     """
     Returns the bit depth of a VideoNode as an integer.
     """
-    _disallow_variable_format(clip)
     return clip.format.bits_per_sample
 
 
@@ -127,6 +169,7 @@ def fallback(value: Optional[T], fallback_value: T) -> T:
     return fallback_value if value is None else value
 
 
+@disallow_variable_format
 def plane(clip: vs.VideoNode, planeno: int, /) -> vs.VideoNode:
     """
     Extract the plane with the given index from the clip.
@@ -135,7 +178,6 @@ def plane(clip: vs.VideoNode, planeno: int, /) -> vs.VideoNode:
     :param planeno:  The index that specifies which plane to extract.
     :return: A grayscale clip that only contains the given plane.
     """
-    _disallow_variable_format(clip)
     if clip.format.num_planes == 1 and planeno == 0:
         return clip
     return core.std.ShufflePlanes(clip, planeno, vs.GRAY)
@@ -152,11 +194,11 @@ def get_y(clip: vs.VideoNode, /) -> vs.VideoNode:
     return plane(clip, 0)
 
 
+@disallow_variable_format
 def split(clip: vs.VideoNode, /) -> List[vs.VideoNode]:
     """
     Returns a list of planes for the given input clip.
     """
-    _disallow_variable_format(clip)
     return [plane(clip, x) for x in range(clip.format.num_planes)]
 
 
@@ -212,6 +254,7 @@ def is_image(filename: str, /) -> bool:
     return types_map.get(path.splitext(filename)[-1], '').startswith('image/')
 
 
+@disallow_variable_format
 def depth(clip: vs.VideoNode,
           bitdepth: int,
           /,
@@ -236,7 +279,6 @@ def depth(clip: vs.VideoNode,
 
     :return: Converted clip with desired bit depth and sample type. ColorFamily will be same as input.
     """
-    _disallow_variable_format(clip)
     sample_type = _resolve_enum(vs.SampleType, sample_type, 'sample_type', 'vapoursynth')
     range = _resolve_enum(Range, range, 'range')
     range_in = _resolve_enum(Range, range_in, 'range_in')
@@ -281,31 +323,3 @@ def _resolve_enum(enum: Type[E], value: Any, var_name: str, module: Optional[str
         return enum(value)
     except ValueError:
         raise ValueError(f'{var_name} must be in {_readable_enums(enum, module)}.') from None
-
-
-def is_variable(clip: vs.VideoNode, /, *, format: bool = False, resolution: bool = False) -> bool:
-    """
-    Returns True if at least one of the specified clip's attributes is variable.
-    It is an error to use this without specifying which attribute to check.
-    """
-    if not format and not resolution:
-        raise ValueError('At least one attribute must be specified as `True`.')
-
-    if format:
-        if clip.format is None:
-            return True
-    if resolution:
-        if 0 in (clip.width, clip.height):
-            return True
-
-    return False
-
-
-def _disallow_variable_format(clip: vs.VideoNode, /) -> None:
-    if is_variable(clip, format=True):
-        raise ValueError('Variable-format clips not supported.')
-
-
-def _disallow_variable_resolution(clip: vs.VideoNode, /) -> None:
-    if is_variable(clip, resolution=True):
-        raise ValueError('Variable-resolution clips not supported.')
