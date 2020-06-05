@@ -7,6 +7,7 @@ __all__ = ['Dither', 'Range', 'depth', 'disallow_variable_format', 'disallow_var
            'split']
 
 from enum import Enum, IntEnum
+from functools import wraps
 from mimetypes import types_map
 from os import path
 from typing import Any, Callable, List, Literal, Optional, Tuple, Type, TypeVar, Union
@@ -59,6 +60,7 @@ def disallow_variable_format(function: Callable[..., R]) -> Callable[..., R]:
     """
     Function decorator that raises an exception if the input clip has a variable format.
     """
+    @wraps(function)
     def _check(clip: vs.VideoNode, *args, **kwargs) -> R:
         if is_variable(clip, format=True):
             raise ValueError('Variable-format clips not supported.')
@@ -70,6 +72,7 @@ def disallow_variable_resolution(function: Callable[..., R]) -> Callable[..., R]
     """
     Function decorator that raises an exception if the input clip has a variable resolution.
     """
+    @wraps(function)
     def _check(clip: vs.VideoNode, *args, **kwargs) -> R:
         if is_variable(clip, resolution=True):
             raise ValueError('Variable-resolution clips not supported.')
