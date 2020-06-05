@@ -68,11 +68,11 @@ def disallow_variable_format(function: Callable[..., R]) -> Callable[..., R]:
 
 def disallow_variable_resolution(function: Callable[..., R]) -> Callable[..., R]:
     """
-    Function decorator that raises an exception if the input clip has a variable format.
+    Function decorator that raises an exception if the input clip has a variable resolution.
     """
     def _check(clip: vs.VideoNode, *args, **kwargs) -> R:
         if is_variable(clip, resolution=True):
-            raise ValueError('Variable-format clips not supported.')
+            raise ValueError('Variable-resolution clips not supported.')
         return function(clip, *args, **kwargs)
     return _check
 
