@@ -17,7 +17,6 @@ core = vs.core
 T = TypeVar('T')
 E = TypeVar('E', bound=Enum)
 R = TypeVar('R')
-C = TypeVar('C', bound=Callable)
 
 
 class Range(IntEnum):
@@ -56,26 +55,26 @@ def is_variable(clip: vs.VideoNode, /, *, format: bool = False, resolution: bool
     return False
 
 
-def disallow_variable_format(function: C) -> C:
+def disallow_variable_format(function: Callable[..., R]) -> Callable[..., R]:
     """
     Function decorator that raises an exception if the input clip has a variable format.
     """
-    def _check(clip: vs.VideoNode, *args, **kwargs) -> C:
+    def _check(clip: vs.VideoNode, *args, **kwargs) -> R:
         if is_variable(clip, format=True):
             raise ValueError('Variable-format clips not supported.')
-        return function
-    return cast(C, _check)
+        return function(clip, *args, **kwargs)
+    return _check
 
 
-def disallow_variable_resolution(function: C) -> C:
+def disallow_variable_resolution(function: Callable[..., R]) -> Callable[..., R]:
     """
-    Function decorator that raises an exception if the input clip has a variable resolution.
+    Function decorator that raises an exception if the input clip has a variable format.
     """
-    def _check(clip: vs.VideoNode, *args, **kwargs) -> C:
+    def _check(clip: vs.VideoNode, *args, **kwargs) -> R:
         if is_variable(clip, resolution=True):
             raise ValueError('Variable-format clips not supported.')
-        return function
-    return cast(C, _check)
+        return function(clip, *args, **kwargs)
+    return _check
 
 
 @disallow_variable_format
