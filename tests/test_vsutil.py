@@ -20,6 +20,9 @@ class VsUtilTests(unittest.TestCase):
     WHITE_SAMPLE_CLIP = vs.core.std.BlankClip(format=vs.YUV420P8, width=160, height=120, color=[255, 128, 128],
                                               length=100)
 
+    VARIABLE_FORMAT_CLIP = vs.core.std.Interleave([YUV420P8_CLIP, YUV444P8_CLIP], mismatch=True)
+    VARIABLE_RES_CLIP = vs.core.std.Interleave([BLACK_SAMPLE_CLIP, SMALLER_SAMPLE_CLIP], mismatch=True)
+
     def assert_same_dimensions(self, clip_a: vs.VideoNode, clip_b: vs.VideoNode):
         """
         Assert that two clips have the same width and height.
@@ -219,3 +222,18 @@ class VsUtilTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'vapoursynth.ColorFamily'):
             vsutil._resolve_enum(vs.ColorFamily, 2, 'test', 'vapoursynth')
 
+    def test_is_variable(self):
+        self.assertTrue(vsutil.is_variable(self.VARIABLE_FORMAT_CLIP, format=True))
+        self.assertFalse(vsutil.is_variable(self.VARIABLE_FORMAT_CLIP, resolution=True))
+
+        self.assertTrue(vsutil.is_variable(self.VARIABLE_RES_CLIP, resolution=True))
+        self.assertFalse(vsutil.is_variable(self.VARIABLE_RES_CLIP, format=True))
+
+        self.assertTrue(vsutil.is_variable(self.VARIABLE_FORMAT_CLIP, format=True, resolution=True))
+        self.assertTrue(vsutil.is_variable(self.VARIABLE_RES_CLIP, format=True, resolution=True))
+
+        self.assertFalse(vsutil.is_variable(self.RGB24_CLIP, format=True, resolution=True))
+
+    def test_decorators(self):
+        with self.assertRaisesRegex(ValueError, 'Variable-format'):
+            vsutil.get_subsampling(self.VARIABLE_FORMAT_CLIP)
