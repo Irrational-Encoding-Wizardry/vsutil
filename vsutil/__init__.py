@@ -52,17 +52,17 @@ def disallow_variable_format(function: F) -> F:
     return cast(F, _check)
 
 
-def disallow_variable_resolution(function: Callable[..., R]) -> Callable[..., R]:
+def disallow_variable_resolution(function: F) -> F:
     """
     Function decorator that raises an exception if the input clip has a variable resolution.
     Decorated function's first parameter must be of type `vapoursynth.VideoNode` and is the only parameter checked.
     """
     @wraps(function)
-    def _check(clip: vs.VideoNode, *args, **kwargs) -> R:
+    def _check(clip: vs.VideoNode, *args, **kwargs) -> Any:
         if 0 in (clip.width, clip.height):
             raise ValueError('Variable-resolution clips not supported.')
         return function(clip, *args, **kwargs)
-    return _check
+    return cast(F, _check)
 
 
 @disallow_variable_format
