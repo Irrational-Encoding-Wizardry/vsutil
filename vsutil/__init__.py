@@ -10,7 +10,7 @@ from enum import Enum, IntEnum
 from functools import wraps
 from mimetypes import types_map
 from os import path
-from typing import Any, Callable, List, Literal, Optional, Tuple, Type, TypeVar, Union
+from typing import Any, Callable, cast, List, Literal, Optional, Tuple, Type, TypeVar, Union
 
 import vapoursynth as vs
 core = vs.core
@@ -18,6 +18,7 @@ core = vs.core
 T = TypeVar('T')
 E = TypeVar('E', bound=Enum)
 R = TypeVar('R')
+F = TypeVar('F', bound=Callable[..., Any])
 
 
 class Range(IntEnum):
@@ -38,17 +39,17 @@ class Dither(Enum):
     ERROR_DIFFUSION = 'error_diffusion'  # Floyd-Steinberg error diffusion.
 
 
-def disallow_variable_format(function: Callable[..., R]) -> Callable[..., R]:
+def disallow_variable_format(function: F) -> F:
     """
     Function decorator that raises an exception if the input clip has a variable format.
     Decorated function's first parameter must be of type `vapoursynth.VideoNode` and is the only parameter checked.
     """
     @wraps(function)
-    def _check(clip: vs.VideoNode, *args, **kwargs) -> R:
+    def _check(clip: vs.VideoNode, *args, **kwargs) -> Any:
         if clip.format is None:
             raise ValueError('Variable-format clips not supported.')
         return function(clip, *args, **kwargs)
-    return _check
+    return cast(F, _check)
 
 
 def disallow_variable_resolution(function: Callable[..., R]) -> Callable[..., R]:
