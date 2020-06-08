@@ -170,13 +170,14 @@ def plane(clip: vs.VideoNode, planeno: int, /) -> vs.VideoNode:
     return core.std.ShufflePlanes(clip, planeno, vs.GRAY)
 
 
+@disallow_variable_format
 def get_y(clip: vs.VideoNode, /) -> vs.VideoNode:
     """
     Helper to get the luma of a VideoNode.
 
     If passed a single-plane vs.GRAY clip, it is assumed to be the luma and returned (no-op).
     """
-    if clip.format is None or clip.format.color_family not in (vs.YUV, vs.YCOCG, vs.GRAY):
+    if clip.format.color_family not in (vs.YUV, vs.YCOCG, vs.GRAY):
         raise ValueError('The clip must have a luma plane.')
     return plane(clip, 0)
 
