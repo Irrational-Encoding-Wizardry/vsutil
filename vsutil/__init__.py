@@ -245,7 +245,7 @@ def depth(clip: vs.VideoNode,
     # thanks @Frechdachs for explaining this:
     # 'you need dithering when raising the bitdepth of full range [or] converting between full and limited'
     should_dither = (range_in != range
-                     or clip.format.sample_type != sample_type
+                     or (clip.format.sample_type != sample_type and (curr_depth + 6) > bitdepth)
                      or (range_in == Range.FULL and not (curr_depth, bitdepth) == (8, 16))
                      or curr_depth > bitdepth)
     dither_type = fallback(dither_type, Dither.ERROR_DIFFUSION if should_dither else Dither.NONE)
