@@ -244,9 +244,13 @@ def depth(clip: vs.VideoNode,
 
     # thanks @Frechdachs for explaining this:
     # 'you need dithering when raising the bitdepth of full range [or] converting between full and limited'
+    # the exception is when converting from 8 to 16 bit full range, (0-255) * 257 -> (0-65535)
+    # dithering is always needed when converting from float to integer precision
+    # dithering is needed when converting from an integer depth greater than 10 to half float, despite the higher bidepth
     should_dither = (range_in != range
-                     or range_in == Range.FULL
-                     or (curr_depth > bitdepth and sample_type == vs.INTEGER))
+                     or (clip.format.sample_type != sample_type and (curr_depth + 6) > bitdepth)
+                     or (range_in == Range.FULL and not (curr_depth, bitdepth) == (8, 16))
+                     or curr_depth > bitdepth)
     dither_type = fallback(dither_type, Dither.ERROR_DIFFUSION if should_dither else Dither.NONE)
 
     return clip.resize.Point(format=clip.format.replace(bits_per_sample=bitdepth, sample_type=sample_type),
