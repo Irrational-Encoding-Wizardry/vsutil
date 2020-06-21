@@ -7,7 +7,7 @@ __all__ = ['Dither', 'Range', 'depth', 'fallback', 'frame2clip', 'get_depth', 'g
 from enum import Enum, IntEnum
 from mimetypes import types_map
 from os import path
-from typing import Any, Callable, List, Literal, Optional, Tuple, Type, TypeVar, Union
+from typing import Any, Callable, cast, List, Literal, Optional, Tuple, Type, TypeVar, Union
 
 import vapoursynth as vs
 core = vs.core
@@ -227,7 +227,7 @@ def depth(clip: vs.VideoNode,
     :param range_in:    Input pixel range (defaults to input clip's range). See `Range`.
     :param dither_type: Dithering algorithm. Allows overriding default dithering behavior. See `Dither`.
         Defaults to Floyd-Steinberg error diffusion when downsampling, converting between ranges, or upsampling full
-        range input. Defaults to 'none', or round to nearest, otherwise.
+        range input. Defaults to 'none', or round to nearest, otherwise. See `_should_dither()` for more information.
 
     :return: Converted clip with desired bit depth and sample type. ColorFamily will be same as input.
     """
@@ -242,17 +242,7 @@ def depth(clip: vs.VideoNode,
     if (curr_depth, clip.format.sample_type, range_in) == (bitdepth, sample_type, range):
         return clip
 
-    # thanks @Frechdachs for explaining this:
-    # 'you need dithering when raising the bitdepth of full range [or] converting between full and limited'
-    # The exception is when converting from 8 to 16 bit full range, (0-255) * 257 -> (0-65535).
-    # Dithering is always needed when converting from float to integer precision.
-    # Dithering is theoretically needed when converting from an integer depth greater than 10 to half float,
-    # despite the higher bitdepth, but zimg currently will not dither for float output.
-    should_dither = (range_in != range  # full->limited OR limited->full
-                     or clip.format.sample_type == vs.FLOAT  # float->int
-                     or (range_in == Range.FULL  # full/int->full/int...
-                         and not (curr_depth, bitdepth) == (8, 16))  # ...but specifically not for 8->16
-                     or curr_depth > bitdepth) and sample_type == vs.INTEGER  # limited/int->limited/int if downsampling
+    should_dither = _should_dither(bitdepth, out_range=range, out_sample_type=sample_type, clip=clip, in_range=range_in)
 
     dither_type = fallback(dither_type, Dither.ERROR_DIFFUSION if should_dither else Dither.NONE)
 
@@ -282,3 +272,57 @@ def _resolve_enum(enum: Type[E], value: Any, var_name: str, module: Optional[str
         return enum(value)
     except ValueError:
         raise ValueError(f'{var_name} must be in {_readable_enums(enum, module)}.') from None
+
+
+def _should_dither(out_bits: int,
+                   out_range: Optional[Range] = None,
+                   out_sample_type: Optional[vs.SampleType] = None,
+                   clip: Optional[vs.VideoNode] = None,
+                   in_bits: Optional[int] = None,
+                   in_range: Optional[Range] = None,
+                   in_sample_type: Optional[vs.SampleType] = None,
+                   ) -> bool:
+    """
+    Determines whether dithering is needed for a given depth/range/sample_type conversion.
+
+    If a clip is given, the clip's properties will take precedence over the in_bits and in_sample_type parameters.
+    If a variable-format clip is given, in_bits and in_sample_type are required.
+
+    If an input range is specified, and output range *should* be specified otherwise it assumes a range conversion.
+
+    For an explanation of when dithering is needed:
+        - Dithering is NEVER needed if the conversion results in a float sample type.
+        - Dithering is ALWAYS needed for a range conversion (i.e. full to limited or vice-versa).
+        - Dithering is ALWAYS needed to convert a float sample type to an integer sample type.
+        - Dithering is needed when upsampling full range content with the exception of 8 -> 16 bit upsampling,
+          as this is simply (0-255) * 257 -> (0-65535).
+        - Dithering is needed when downsampling limited or full range.
+
+    Dithering is theoretically needed when converting from an integer depth greater than 10 to half float,
+    despite the higher bit depth, but zimg's internal resampler currently does not dither for float output.
+    """
+    out_sample_type = fallback(out_sample_type, vs.FLOAT if out_bits == 32 else vs.INTEGER)
+
+    if out_sample_type == vs.FLOAT:  # zimg will not dither for conversions resulting in float sample type
+        return False
+
+    if clip is not None:
+        if clip.format is not None:
+            in_bits = clip.format.bits_per_sample
+            in_sample_type = clip.format.sample_type
+        elif clip.format is None:
+            if in_bits is None:
+                raise ValueError('For variable-format clips, the input bit depth must be specified.')
+            if in_sample_type is None:
+                raise ValueError('For variable-format clips, the input sample type must be specified.')
+
+    range_conversion = in_range != out_range
+    float_to_int = in_sample_type == vs.FLOAT
+    upsampling = cast(int, in_bits) < out_bits
+    downsampling = cast(int, in_bits) > out_bits
+
+    return True if (range_conversion
+                    or float_to_int
+                    or (in_range == Range.FULL and upsampling and (in_bits, out_bits) != (8, 16))
+                    or downsampling) \
+        else False
