@@ -321,8 +321,7 @@ def _should_dither(out_bits: int,
     upsampling = cast(int, in_bits) < out_bits
     downsampling = cast(int, in_bits) > out_bits
 
-    return True if (range_conversion
-                    or float_to_int
-                    or (in_range == Range.FULL and upsampling and (in_bits, out_bits) != (8, 16))
-                    or downsampling) \
-        else False
+    return bool(range_conversion
+                or float_to_int
+                or (in_range == Range.FULL and upsampling and (in_bits, out_bits) != (8, 16))
+                or downsampling)
