@@ -263,7 +263,7 @@ def depth(clip: vs.VideoNode,
     :param range_in:    Input pixel range (defaults to input clip's range). See `Range`.
     :param dither_type: Dithering algorithm. Allows overriding default dithering behavior. See `Dither`.
         Defaults to Floyd-Steinberg error diffusion when downsampling, converting between ranges, or upsampling full
-        range input. Defaults to 'none', or round to nearest, otherwise.
+        range input. Defaults to 'none', or round to nearest, otherwise. See `_should_dither()` for more information.
 
     :return: Converted clip with desired bit depth and sample type. ColorFamily will be same as input.
     """
@@ -278,15 +278,8 @@ def depth(clip: vs.VideoNode,
     if (curr_depth, clip.format.sample_type, range_in) == (bitdepth, sample_type, range):
         return clip
 
-    # thanks @Frechdachs for explaining this:
-    # 'you need dithering when raising the bitdepth of full range [or] converting between full and limited'
-    # the exception is when converting from 8 to 16 bit full range, (0-255) * 257 -> (0-65535)
-    # dithering is always needed when converting from float to integer precision
-    # dithering is needed when converting from an integer depth greater than 10 to half float, despite the higher bidepth
-    should_dither = (range_in != range
-                     or (clip.format.sample_type != sample_type and (curr_depth + 6) > bitdepth)
-                     or (range_in == Range.FULL and not (curr_depth, bitdepth) == (8, 16))
-                     or curr_depth > bitdepth)
+    should_dither = _should_dither(curr_depth, bitdepth, range_in, range, clip.format.sample_type, sample_type)
+
     dither_type = fallback(dither_type, Dither.ERROR_DIFFUSION if should_dither else Dither.NONE)
 
     return clip.resize.Point(format=clip.format.replace(bits_per_sample=bitdepth, sample_type=sample_type),
@@ -315,3 +308,43 @@ def _resolve_enum(enum: Type[E], value: Any, var_name: str, module: Optional[str
         return enum(value)
     except ValueError:
         raise ValueError(f'{var_name} must be in {_readable_enums(enum, module)}.') from None
+
+
+def _should_dither(in_bits: int,
+                   out_bits: int,
+                   in_range: Optional[Range] = None,
+                   out_range: Optional[Range] = None,
+                   in_sample_type: Optional[vs.SampleType] = None,
+                   out_sample_type: Optional[vs.SampleType] = None,
+                   ) -> bool:
+    """
+    Determines whether dithering is needed for a given depth/range/sample_type conversion.
+
+    If an input range is specified, and output range *should* be specified otherwise it assumes a range conversion.
+
+    For an explanation of when dithering is needed:
+        - Dithering is NEVER needed if the conversion results in a float sample type.
+        - Dithering is ALWAYS needed for a range conversion (i.e. full to limited or vice-versa).
+        - Dithering is ALWAYS needed to convert a float sample type to an integer sample type.
+        - Dithering is needed when upsampling full range content with the exception of 8 -> 16 bit upsampling,
+          as this is simply (0-255) * 257 -> (0-65535).
+        - Dithering is needed when downsampling limited or full range.
+
+    Dithering is theoretically needed when converting from an integer depth greater than 10 to half float,
+    despite the higher bit depth, but zimg's internal resampler currently does not dither for float output.
+    """
+    out_sample_type = fallback(out_sample_type, vs.FLOAT if out_bits == 32 else vs.INTEGER)
+    in_sample_type = fallback(in_sample_type, vs.FLOAT if in_bits == 32 else vs.INTEGER)
+
+    if out_sample_type == vs.FLOAT:
+        return False
+
+    range_conversion = in_range != out_range
+    float_to_int = in_sample_type == vs.FLOAT
+    upsampling = in_bits < out_bits
+    downsampling = in_bits > out_bits
+
+    return bool(range_conversion
+                or float_to_int
+                or (in_range == Range.FULL and upsampling and (in_bits, out_bits) != (8, 16))
+                or downsampling)

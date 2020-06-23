@@ -173,7 +173,7 @@ class VsUtilTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Count cannot be negative.'):
             vsutil.iterate(2, double_number, -1)
 
-    def test_depth(self):  # TODO: test dither/range/range_in logic
+    def test_depth(self):
         with self.assertRaisesRegex(ValueError, 'sample_type must be in'):
             vsutil.depth(self.RGB24_CLIP, 8, sample_type=2)
         with self.assertRaisesRegex(ValueError, 'range must be in'):
@@ -220,6 +220,31 @@ class VsUtilTests(unittest.TestCase):
 
         with self.assertRaisesRegex(ValueError, 'vapoursynth.ColorFamily'):
             vsutil._resolve_enum(vs.ColorFamily, 2, 'test', 'vapoursynth')
+
+    def test_should_dither(self):
+        # --- True ---
+        # Range conversion
+        self.assertTrue(vsutil._should_dither(1, 1, in_range=vsutil.Range.LIMITED, out_range=vsutil.Range.FULL))
+        # Float to int
+        self.assertTrue(vsutil._should_dither(1, 1, in_sample_type=vs.FLOAT))
+        # Upsampling full range 10 -> 12
+        self.assertTrue(vsutil._should_dither(10, 12, in_range=vsutil.Range.FULL, out_range=vsutil.Range.FULL))
+        # Downsampling
+        self.assertTrue(vsutil._should_dither(10, 8, in_sample_type=vs.INTEGER))
+        self.assertTrue(vsutil._should_dither(10, 8, in_sample_type=vs.INTEGER, in_range=vsutil.Range.FULL, out_range=vsutil.Range.FULL))
+        self.assertTrue(vsutil._should_dither(10, 8, in_sample_type=vs.INTEGER, in_range=vsutil.Range.LIMITED, out_range=vsutil.Range.LIMITED))
+
+        # --- False ---
+        # Int to int
+        self.assertFalse(vsutil._should_dither(8, 8, in_sample_type=vs.INTEGER))
+        # Upsampling full range 8 -> 16
+        self.assertFalse(vsutil._should_dither(8, 16, in_range=vsutil.Range.FULL, out_range=vsutil.Range.FULL))
+        # Upsampling
+        self.assertFalse(vsutil._should_dither(8, 16, in_sample_type=vs.INTEGER))
+        self.assertFalse(vsutil._should_dither(8, 16, in_sample_type=vs.INTEGER, in_range=vsutil.Range.LIMITED, out_range=vsutil.Range.LIMITED))
+        # Float output
+        self.assertFalse(vsutil._should_dither(32, 32, in_sample_type=vs.INTEGER))
+        self.assertFalse(vsutil._should_dither(32, 16, in_sample_type=vs.INTEGER, out_sample_type=vs.FLOAT))
 
     def test_decorators(self):
         with self.assertRaisesRegex(ValueError, 'Variable-format'):
