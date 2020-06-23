@@ -245,3 +245,7 @@ class VsUtilTests(unittest.TestCase):
         # Float output
         self.assertFalse(vsutil._should_dither(32, 32, in_sample_type=vs.INTEGER))
         self.assertFalse(vsutil._should_dither(32, 16, in_sample_type=vs.INTEGER, out_sample_type=vs.FLOAT))
+
+    def test_decorators(self):
+        with self.assertRaisesRegex(ValueError, 'Variable-format'):
+            vsutil.get_subsampling(self.VARIABLE_FORMAT_CLIP)

@@ -1,13 +1,16 @@
 """
 VSUtil. A collection of general-purpose VapourSynth functions to be reused in modules and scripts.
 """
-__all__ = ['Dither', 'Range', 'depth', 'fallback', 'frame2clip', 'get_depth', 'get_plane_size',
-           'get_subsampling', 'get_w', 'get_y', 'insert_clip', 'is_image', 'iterate', 'join', 'plane', 'split']
+__all__ = ['Dither', 'Range', 'depth', 'disallow_variable_format', 'disallow_variable_resolution', 'fallback',
+           'frame2clip', 'get_depth', 'get_plane_size',
+           'get_subsampling', 'get_w', 'get_y', 'insert_clip', 'is_image', 'iterate', 'join', 'plane',
+           'split']
 
 from enum import Enum, IntEnum
+from functools import wraps
 from mimetypes import types_map
 from os import path
-from typing import Any, Callable, List, Literal, Optional, Tuple, Type, TypeVar, Union
+from typing import Any, Callable, cast, List, Literal, Optional, Tuple, Type, TypeVar, Union
 
 import vapoursynth as vs
 core = vs.core
@@ -15,6 +18,7 @@ core = vs.core
 T = TypeVar('T')
 E = TypeVar('E', bound=Enum)
 R = TypeVar('R')
+F = TypeVar('F', bound=Callable[..., Any])
 
 
 class Range(IntEnum):
@@ -35,6 +39,33 @@ class Dither(Enum):
     ERROR_DIFFUSION = 'error_diffusion'  # Floyd-Steinberg error diffusion.
 
 
+def disallow_variable_format(function: F) -> F:
+    """
+    Function decorator that raises an exception if the input clip has a variable format.
+    Decorated function's first parameter must be of type `vapoursynth.VideoNode` and is the only parameter checked.
+    """
+    @wraps(function)
+    def _check(clip: vs.VideoNode, *args, **kwargs) -> Any:
+        if clip.format is None:
+            raise ValueError('Variable-format clips not supported.')
+        return function(clip, *args, **kwargs)
+    return cast(F, _check)
+
+
+def disallow_variable_resolution(function: F) -> F:
+    """
+    Function decorator that raises an exception if the input clip has a variable resolution.
+    Decorated function's first parameter must be of type `vapoursynth.VideoNode` and is the only parameter checked.
+    """
+    @wraps(function)
+    def _check(clip: vs.VideoNode, *args, **kwargs) -> Any:
+        if 0 in (clip.width, clip.height):
+            raise ValueError('Variable-resolution clips not supported.')
+        return function(clip, *args, **kwargs)
+    return cast(F, _check)
+
+
+@disallow_variable_format
 def get_subsampling(clip: vs.VideoNode, /) -> Union[None, str]:
     """
     Returns the subsampling of a VideoNode in human-readable format.
@@ -58,6 +89,7 @@ def get_subsampling(clip: vs.VideoNode, /) -> Union[None, str]:
         raise ValueError('Unknown subsampling.')
 
 
+@disallow_variable_format
 def get_depth(clip: vs.VideoNode, /) -> int:
     """
     Returns the bit depth of a VideoNode as an integer.
@@ -124,6 +156,7 @@ def fallback(value: Optional[T], fallback_value: T) -> T:
     return fallback_value if value is None else value
 
 
+@disallow_variable_format
 def plane(clip: vs.VideoNode, planeno: int, /) -> vs.VideoNode:
     """
     Extract the plane with the given index from the clip.
@@ -137,17 +170,19 @@ def plane(clip: vs.VideoNode, planeno: int, /) -> vs.VideoNode:
     return core.std.ShufflePlanes(clip, planeno, vs.GRAY)
 
 
+@disallow_variable_format
 def get_y(clip: vs.VideoNode, /) -> vs.VideoNode:
     """
     Helper to get the luma of a VideoNode.
 
     If passed a single-plane vs.GRAY clip, it is assumed to be the luma and returned (no-op).
     """
-    if clip.format is None or clip.format.color_family not in (vs.YUV, vs.YCOCG, vs.GRAY):
+    if clip.format.color_family not in (vs.YUV, vs.YCOCG, vs.GRAY):
         raise ValueError('The clip must have a luma plane.')
     return plane(clip, 0)
 
 
+@disallow_variable_format
 def split(clip: vs.VideoNode, /) -> List[vs.VideoNode]:
     """
     Returns a list of planes for the given input clip.
@@ -207,6 +242,7 @@ def is_image(filename: str, /) -> bool:
     return types_map.get(path.splitext(filename)[-1], '').startswith('image/')
 
 
+@disallow_variable_format
 def depth(clip: vs.VideoNode,
           bitdepth: int,
           /,
