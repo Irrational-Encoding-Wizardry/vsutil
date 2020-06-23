@@ -303,7 +303,7 @@ def _should_dither(out_bits: int,
     """
     out_sample_type = fallback(out_sample_type, vs.FLOAT if out_bits == 32 else vs.INTEGER)
 
-    if out_sample_type == vs.FLOAT:  # zimg will not dither for conversions resulting in float sample type
+    if out_sample_type == vs.FLOAT:
         return False
 
     if clip is not None:
