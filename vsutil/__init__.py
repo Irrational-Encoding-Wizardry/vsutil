@@ -7,7 +7,7 @@ __all__ = ['Dither', 'Range', 'depth', 'fallback', 'frame2clip', 'get_depth', 'g
 from enum import Enum, IntEnum
 from mimetypes import types_map
 from os import path
-from typing import Any, Callable, cast, List, Literal, Optional, Tuple, Type, TypeVar, Union
+from typing import Any, Callable, List, Literal, Optional, Tuple, Type, TypeVar, Union
 
 import vapoursynth as vs
 core = vs.core
@@ -242,7 +242,7 @@ def depth(clip: vs.VideoNode,
     if (curr_depth, clip.format.sample_type, range_in) == (bitdepth, sample_type, range):
         return clip
 
-    should_dither = _should_dither(bitdepth, out_range=range, out_sample_type=sample_type, clip=clip, in_range=range_in)
+    should_dither = _should_dither(curr_depth, bitdepth, range_in, range, clip.format.sample_type, sample_type)
 
     dither_type = fallback(dither_type, Dither.ERROR_DIFFUSION if should_dither else Dither.NONE)
 
@@ -274,19 +274,15 @@ def _resolve_enum(enum: Type[E], value: Any, var_name: str, module: Optional[str
         raise ValueError(f'{var_name} must be in {_readable_enums(enum, module)}.') from None
 
 
-def _should_dither(out_bits: int,
-                   out_range: Optional[Range] = None,
-                   out_sample_type: Optional[vs.SampleType] = None,
-                   clip: Optional[vs.VideoNode] = None,
-                   in_bits: Optional[int] = None,
+def _should_dither(in_bits: int,
+                   out_bits: int,
                    in_range: Optional[Range] = None,
+                   out_range: Optional[Range] = None,
                    in_sample_type: Optional[vs.SampleType] = None,
+                   out_sample_type: Optional[vs.SampleType] = None,
                    ) -> bool:
     """
     Determines whether dithering is needed for a given depth/range/sample_type conversion.
-
-    If a clip is given, the clip's properties will take precedence over the in_bits and in_sample_type parameters.
-    If a variable-format clip is given, in_bits and in_sample_type are required.
 
     If an input range is specified, and output range *should* be specified otherwise it assumes a range conversion.
 
@@ -302,24 +298,15 @@ def _should_dither(out_bits: int,
     despite the higher bit depth, but zimg's internal resampler currently does not dither for float output.
     """
     out_sample_type = fallback(out_sample_type, vs.FLOAT if out_bits == 32 else vs.INTEGER)
+    in_sample_type = fallback(in_sample_type, vs.FLOAT if in_bits == 32 else vs.INTEGER)
 
     if out_sample_type == vs.FLOAT:
         return False
 
-    if clip is not None:
-        if clip.format is not None:
-            in_bits = clip.format.bits_per_sample
-            in_sample_type = clip.format.sample_type
-        elif clip.format is None:
-            if in_bits is None:
-                raise ValueError('For variable-format clips, the input bit depth must be specified.')
-            if in_sample_type is None:
-                raise ValueError('For variable-format clips, the input sample type must be specified.')
-
     range_conversion = in_range != out_range
     float_to_int = in_sample_type == vs.FLOAT
-    upsampling = cast(int, in_bits) < out_bits
-    downsampling = cast(int, in_bits) > out_bits
+    upsampling = in_bits < out_bits
+    downsampling = in_bits > out_bits
 
     return bool(range_conversion
                 or float_to_int
