@@ -1,10 +1,18 @@
 """
 VSUtil. A collection of general-purpose VapourSynth functions to be reused in modules and scripts.
 """
-__all__ = ['Dither', 'Range', 'depth', 'disallow_variable_format', 'disallow_variable_resolution', 'fallback',
-           'frame2clip', 'get_depth', 'get_plane_size',
-           'get_subsampling', 'get_w', 'get_y', 'insert_clip', 'is_image', 'iterate', 'join', 'plane',
-           'split']
+__all__ = [
+    # enums
+    'Dither', 'Range',
+    # decorators
+    'disallow_variable_format', 'disallow_variable_resolution',
+    # misc non-vapoursynth related
+    'fallback', 'get_w', 'is_image', 'iterate',
+    # uses clip
+    'get_depth', 'get_plane_size', 'get_subsampling',
+    # returns/modifies clip
+    'depth', 'frame2clip', 'get_y', 'insert_clip', 'join', 'plane', 'split',
+]
 
 from enum import Enum, IntEnum
 from functools import wraps
