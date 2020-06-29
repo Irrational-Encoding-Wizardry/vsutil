@@ -18,7 +18,7 @@ from enum import Enum
 from functools import wraps
 from mimetypes import types_map
 from os import path
-from typing import Any, Callable, cast, List, Literal, Optional, Tuple, Type, TypeVar, Union
+from typing import Any, Callable, cast, List, Optional, Tuple, Type, TypeVar, Union
 
 import vapoursynth as vs
 core = vs.core
@@ -26,7 +26,7 @@ core = vs.core
 T = TypeVar('T')
 E = TypeVar('E', bound=Enum)
 R = TypeVar('R')
-F = TypeVar('F', bound=Callable[..., Any])
+F = TypeVar('F', bound=Callable)
 
 
 class Range(int, Enum):
@@ -198,11 +198,12 @@ def split(clip: vs.VideoNode, /) -> List[vs.VideoNode]:
     return [plane(clip, x) for x in range(clip.format.num_planes)]
 
 
-def join(planes: List[vs.VideoNode],
-         family: Literal[vs.ColorFamily.RGB, vs.ColorFamily.YUV, vs.ColorFamily.YCOCG] = vs.YUV) -> vs.VideoNode:
+def join(planes: List[vs.VideoNode], family: vs.ColorFamily = vs.YUV) -> vs.VideoNode:
     """
     Joins the supplied list of planes into a three-plane VideoNode (defaults to YUV).
     """
+    if family not in [vs.RGB, vs.YUV, vs.YCOCG]:
+        raise ValueError('Color family must have 3 planes.')
     return core.std.ShufflePlanes(clips=planes, planes=[0, 0, 0], colorfamily=family)
 
 
