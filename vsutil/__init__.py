@@ -259,8 +259,8 @@ def depth(clip: vs.VideoNode,
           *,
           range: Optional[Union[int, Range]] = None,
           range_in: Optional[Union[int, Range]] = None,
-          dither_type: Optional[Union[Dither, str]] = None) \
-        -> vs.VideoNode:
+          dither_type: Optional[Union[Dither, str]] = None,
+          ) -> vs.VideoNode:
     """
     A bit depth converter only using core.resize and Format.replace.
     By default, outputs FLOAT sample type for 32 bit and INTEGER for anything else.
