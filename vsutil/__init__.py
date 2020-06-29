@@ -288,13 +288,11 @@ def depth(clip: vs.VideoNode,
         return clip
 
     should_dither = _should_dither(curr_depth, bitdepth, range_in, range, clip.format.sample_type, sample_type)
-
     dither_type = fallback(dither_type, Dither.ERROR_DIFFUSION if should_dither else Dither.NONE)
 
-    return clip.resize.Point(format=clip.format.replace(bits_per_sample=bitdepth, sample_type=sample_type),
-                             range=range,
-                             range_in=range_in,
-                             dither_type=dither_type.value)
+    new_format = clip.format.replace(bits_per_sample=bitdepth, sample_type=sample_type).id
+
+    return clip.resize.Point(format=new_format, range=range, range_in=range_in, dither_type=dither_type)
 
 
 def _readable_enums(enum: Type[Enum], module: Optional[str] = None) -> str:
