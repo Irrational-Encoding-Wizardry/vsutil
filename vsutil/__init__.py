@@ -14,7 +14,7 @@ __all__ = [
     'depth', 'frame2clip', 'get_y', 'insert_clip', 'join', 'plane', 'split',
 ]
 
-from enum import Enum, IntEnum
+from enum import Enum
 from functools import wraps
 from mimetypes import types_map
 from os import path
@@ -29,7 +29,7 @@ R = TypeVar('R')
 F = TypeVar('F', bound=Callable[..., Any])
 
 
-class Range(IntEnum):
+class Range(int, Enum):
     """
     enum for zimg_pixel_range_e
     """
@@ -37,7 +37,7 @@ class Range(IntEnum):
     FULL =    1  # Full (PC) dynamic range, 0-255 in 8 bits.
 
 
-class Dither(Enum):
+class Dither(str, Enum):
     """
     enum for zimg_dither_type_e
     """
