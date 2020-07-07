@@ -113,10 +113,20 @@ class VsUtilTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             vsutil.insert_clip(self.BLACK_SAMPLE_CLIP, self.BLACK_SAMPLE_CLIP, 90)
 
+    def test_no_value(self):
+        self.assertIs(vsutil.no_value(), vsutil.no_value())
+        self.assertIsNot(vsutil.no_value(), None)
+            
     def test_fallback(self):
         self.assertEqual(vsutil.fallback(None, 'a value'), 'a value')
         self.assertEqual(vsutil.fallback('a value', 'another value'), 'a value')
         self.assertEqual(vsutil.fallback(None, sum(range(5))), 10)
+        self.assertEqual(vsutil.fallback(vsutil.no_value(), 'a value'), 'a value')
+        
+        self.assertEqual(vsutil.fallback(None, 'a value', none_as_default=False), None)
+        self.assertEqual(vsutil.fallback('a value', 'another value', none_as_default=False), 'a value')
+        self.assertEqual(vsutil.fallback(None, sum(range(5)), none_as_default=False), None)
+        self.assertEqual(vsutil.fallback(vsutil.no_value(), 'a value', none_as_default=False), 'a value')
 
     def test_get_y(self):
         y = vsutil.get_y(self.BLACK_SAMPLE_CLIP)
