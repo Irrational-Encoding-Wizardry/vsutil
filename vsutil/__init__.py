@@ -157,7 +157,13 @@ def insert_clip(clip: vs.VideoNode, /, insert: vs.VideoNode, start_frame: int) -
     return pre + insert + post
 
 
-_NO_ARGUMENT: Any = object()
+class _NoArgumentType(enum.Enum):
+    NO_ARGUMENT = enum.auto()
+    
+    def __repr__(self):
+        return "no value"
+    
+    __str__ = __repr__
 
 
 def no_value() -> T:
@@ -175,7 +181,7 @@ def no_value() -> T:
         
     This function is solely intended for use with fallback.
     """
-    return cast(T, _NO_ARGUMENT)
+    return cast(T, _NoArgumentType.NO_ARGUMENT)
 
 
 def fallback(value: Optional[T], fallback_value: T, *, none_as_default: bool = True) -> T:
@@ -200,7 +206,7 @@ def fallback(value: Optional[T], fallback_value: T, *, none_as_default: bool = T
     :param none_as_default: Set this to False if fallback should treat None as a valid value
                             that should not be replaced by the default value.
     """
-    is_default_value = value is _NO_ARGUMENT
+    is_default_value = value is no_value()
     if none_as_default and not is_default_value:
         is_default_value = value is None
         
