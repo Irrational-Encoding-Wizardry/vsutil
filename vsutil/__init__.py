@@ -14,7 +14,7 @@ __all__ = [
     'depth', 'frame2clip', 'get_y', 'insert_clip', 'join', 'plane', 'split',
 ]
 
-from enum import Enum
+from enum import Enum, auto
 from functools import wraps
 from mimetypes import types_map
 from os import path
@@ -157,8 +157,8 @@ def insert_clip(clip: vs.VideoNode, /, insert: vs.VideoNode, start_frame: int) -
     return pre + insert + post
 
 
-class _NoArgumentType(enum.Enum):
-    NO_ARGUMENT = enum.auto()
+class _NoArgumentType(Enum):
+    NO_ARGUMENT = auto()
     
     def __repr__(self):
         return "no value"
