@@ -7,7 +7,7 @@ __all__ = [
     # decorators
     'disallow_variable_format', 'disallow_variable_resolution',
     # misc non-vapoursynth related
-    'fallback', 'get_w', 'is_image', 'iterate',
+    'default_value', 'fallback', 'get_w', 'is_image', 'iterate',
     # uses clip
     'get_depth', 'get_plane_size', 'get_subsampling',
     # returns/modifies clip
@@ -157,11 +157,54 @@ def insert_clip(clip: vs.VideoNode, /, insert: vs.VideoNode, start_frame: int) -
     return pre + insert + post
 
 
-def fallback(value: Optional[T], fallback_value: T) -> T:
+_NO_ARGUMENT: Any = object()
+
+
+def no_value() -> T:
     """
-    Utility function that returns a value or a fallback if the value is None.
+    This utility function returns a value that fallback will always treat as no-value-passed.
+    
+        >>> my_parameter = no_value()
+        >>> fallback(my_parameter, 5)
+        5
+        
+    The result of this function is a singleton. You *must* check using `is`
+    
+        >>> no_value() is no_value()
+        True
+        
+    This function is solely intended for use with fallback.
     """
-    return fallback_value if value is None else value
+    return cast(T, _NO_ARGUMENT)
+
+
+def fallback(value: Optional[T], fallback_value: T, *, none_as_default: bool = True) -> T:
+    """
+    Utility function that returns a value or a fallback if the value is None or no_value().
+    
+        >>> fallback(None, 5)
+        5
+        >>> fallback(6, 5)
+        6
+    
+    Sometimes it is useful to have None as a valid parameter-value that does not mean "use the
+    default". In this case:
+    
+        >>> fallback(None, 5, none_as_default=False)
+        None
+        >>> fallback(6, 5 none_as_default=False)
+        6
+        >>> fallback(no_value(), 5, none_as_default=False)
+        5
+    
+    :param none_as_default: Set this to False if fallback should treat None as a valid value
+                            that should not be replaced by the default value.
+    """
+    is_default_value = value is _NO_ARGUMENT
+    if none_as_default and not is_default_value:
+        is_default_value = value is None
+        
+    return fallback_value if is_default_value else value
 
 
 @disallow_variable_format
