@@ -7,7 +7,7 @@ __all__ = [
     # decorators
     'disallow_variable_format', 'disallow_variable_resolution',
     # misc non-vapoursynth related
-    'default_value', 'fallback', 'get_w', 'is_image', 'iterate',
+    'no_value', 'fallback', 'get_w', 'is_image', 'iterate',
     # uses clip
     'get_depth', 'get_plane_size', 'get_subsampling',
     # returns/modifies clip
