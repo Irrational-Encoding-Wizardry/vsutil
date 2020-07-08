@@ -252,9 +252,9 @@ def is_image(filename: str, /) -> bool:
 
 
 def scale(value: float, 
-          input_depth: int = 8, 
-          output_depth: int = 32, 
-          range_in: Union[int, Range] = False, 
+          input_depth: int, 
+          output_depth: int, 
+          range_in: Union[int, Range] = 0, 
           range: Optional[Union[int, Range]] = None, 
           scale_offsets: bool = False, 
           chroma: bool = False) -> float:
@@ -276,7 +276,7 @@ def scale(value: float,
 
     if input_depth == 32:
         input_peak = 1
-        range_in = True
+        range_in = 1
     elif range_in:
         input_peak = (1 << input_depth) - 1
     else:
@@ -284,7 +284,7 @@ def scale(value: float,
 
     if output_depth == 32:
         output_peak = 1
-        range = True
+        range = 1
     elif range:
         output_peak = (1 << output_depth) - 1
     else:
