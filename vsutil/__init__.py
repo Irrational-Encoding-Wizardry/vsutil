@@ -257,7 +257,7 @@ def scale_value(value: Union[int, float],
           range_in: Union[int, Range] = 0, 
           range: Optional[Union[int, Range]] = None, 
           scale_offsets: bool = False, 
-          chroma: bool = False) -> float:
+          chroma: bool = False) -> Union[int, float]:
     """
     Scales a given value between bit depths, sample types, and/or ranges.
     :value:         Numeric value to be scaled
