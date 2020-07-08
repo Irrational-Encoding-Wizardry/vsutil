@@ -230,7 +230,7 @@ class VsUtilTests(unittest.TestCase):
         self.assertEqual(vsutil.scale(235, 8, 32, range_in=0, range=1, scale_offsets=True, chroma=False), 1)
         self.assertEqual(vsutil.scale(255, 8, 32, range_in=1, range=1, scale_offsets=True, chroma=False), 1)
 
-        self.assertEqual(vsutil.scale(1, 8, 32, range_in=0, range=1, scale_offsets=True, chroma=True), -15/224)
+        self.assertEqual(vsutil.scale(1, 8, 32, range_in=0, range=1, scale_offsets=True, chroma=True), -127/224)
         self.assertEqual(vsutil.scale(1, 8, 32, range_in=1, range=1, scale_offsets=True, chroma=True), 1/255)
         self.assertEqual(vsutil.scale(240, 8, 32, range_in=0, range=1, scale_offsets=True, chroma=True), 0.5)
         self.assertEqual(vsutil.scale(255, 8, 32, range_in=1, range=1, scale_offsets=True, chroma=True), (255-128)/255)
@@ -272,7 +272,7 @@ class VsUtilTests(unittest.TestCase):
         self.assertEqual(vsutil.scale(1, 32, 8, range_in=1, range=0, scale_offsets=True, chroma=False), 235)
         self.assertEqual(vsutil.scale(1, 32, 8, range_in=1, range=1, scale_offsets=True, chroma=False), 255)
 
-        self.assertEqual(vsutil.scale(-15/224, 32, 8, range_in=1, range=0, scale_offsets=True, chroma=True), 1)
+        self.assertEqual(vsutil.scale(-127/224, 32, 8, range_in=1, range=0, scale_offsets=True, chroma=True), 1)
         self.assertEqual(vsutil.scale(1/255, 32, 8, range_in=1, range=1, scale_offsets=True, chroma=True), 1)
         self.assertEqual(vsutil.scale(0.5, 32, 8, range_in=1, range=0, scale_offsets=True, chroma=True), 240)
         self.assertEqual(vsutil.scale((255-128)/255, 32, 8, range_in=1, range=1, scale_offsets=True, chroma=True), 255)
