@@ -7,7 +7,7 @@ __all__ = [
     # decorators
     'disallow_variable_format', 'disallow_variable_resolution',
     # misc non-vapoursynth related
-    'fallback', 'get_w', 'is_image', 'iterate',
+    'fallback', 'get_w', 'is_image', 'iterate', 'scale',
     # uses clip
     'get_depth', 'get_plane_size', 'get_subsampling',
     # returns/modifies clip
@@ -249,6 +249,65 @@ def is_image(filename: str, /) -> bool:
     Returns true if a filename refers to an image.
     """
     return types_map.get(path.splitext(filename)[-1], '').startswith('image/')
+
+
+def scale(value: float, 
+          input_depth: int = 8, 
+          output_depth: int = 32, 
+          range_in: Union[int, Range] = False, 
+          range: Optional[Union[int, Range]] = None, 
+          scale_offsets: bool = False, 
+          chroma: bool = False) -> float:
+    """
+    Scales a given value between bit depths, sample types, and/or ranges.
+    :value:         Numeric value to be scaled
+    :input_depth:   Bit depth of the "value" parameter. Use 32 for float samples
+    :output_depth:  Bit depth to scale the input value to
+    :range_in:      Pixel range of the input value. No clamping is performed
+    :range:         Pixel range of the output value. No clamping is performed
+    :scale_offsets: Whether or not to apply YUV offsets to float chroma and/or TV range integer values
+                    e.g. when scaling a TV range value of 16 to float, setting this to True will return "0.0" rather than "0.073059.."
+    :chroma:        Whether to treat values as chroma instead of luma
+    """
+
+    range_in = _resolve_enum(Range, range_in, 'range_in')
+    range = _resolve_enum(Range, range, 'range')
+    range = fallback(range, range_in)
+
+    if input_depth == 32:
+        input_peak = 1
+        range_in = True
+    elif range_in:
+        input_peak = (1 << input_depth) - 1
+    else:
+        input_peak = (224 if chroma else 219) << (input_depth - 8)
+
+    if output_depth == 32:
+        output_peak = 1
+        range = True
+    elif range:
+        output_peak = (1 << output_depth) - 1
+    else:
+        output_peak = (224 if chroma else 219) << (output_depth - 8)
+
+    if input_depth == output_depth and range_in == range:
+        return value
+
+    if scale_offsets:
+        if output_depth == 32 and chroma:
+            value -= 128 << (input_depth - 8)
+        elif range and not range_in:
+            value -= 16 << (input_depth - 8)
+
+    value *= output_peak / input_peak
+
+    if scale_offsets:
+        if input_depth == 32 and chroma:
+            value += 128 << output_depth - 8
+        elif range_in and not range:
+            value += 16 << (output_depth - 8)
+
+    return value
 
 
 @disallow_variable_format
