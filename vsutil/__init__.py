@@ -7,7 +7,7 @@ __all__ = [
     # decorators
     'disallow_variable_format', 'disallow_variable_resolution',
     # misc non-vapoursynth related
-    'fallback', 'get_w', 'is_image', 'iterate', 'scale',
+    'fallback', 'get_w', 'is_image', 'iterate', 'scale_value',
     # uses clip
     'get_depth', 'get_plane_size', 'get_subsampling',
     # returns/modifies clip
@@ -251,7 +251,7 @@ def is_image(filename: str, /) -> bool:
     return types_map.get(path.splitext(filename)[-1], '').startswith('image/')
 
 
-def scale(value: float, 
+def scale_value(value: Union[int, float], 
           input_depth: int, 
           output_depth: int, 
           range_in: Union[int, Range] = 0, 
@@ -275,20 +275,14 @@ def scale(value: float,
     range = fallback(range, range_in)
 
     if input_depth == 32:
-        input_peak = 1
         range_in = 1
-    elif range_in:
-        input_peak = (1 << input_depth) - 1
-    else:
-        input_peak = (224 if chroma else 219) << (input_depth - 8)
 
     if output_depth == 32:
-        output_peak = 1
         range = 1
-    elif range:
-        output_peak = (1 << output_depth) - 1
-    else:
-        output_peak = (224 if chroma else 219) << (output_depth - 8)
+
+    input_peak = _peak_pixel_value(input_depth, range_in, chroma)
+
+    output_peak = _peak_pixel_value(output_depth, range, chroma)
 
     if input_depth == output_depth and range_in == range:
         return value
@@ -374,6 +368,14 @@ def _resolve_enum(enum: Type[E], value: Any, var_name: str, module: Optional[str
         return enum(value)
     except ValueError:
         raise ValueError(f'{var_name} must be in {_readable_enums(enum, module)}.') from None
+
+
+def _peak_pixel_value(bits: int, range: Union[int, Range], chroma: bool) -> int:
+    if bits == 32:
+        return 1
+    if range:
+        return (1 << bits) - 1
+    return (224 if chroma else 219) << (bits - 8)
 
 
 def _should_dither(in_bits: int,
