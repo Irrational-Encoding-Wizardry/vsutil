@@ -249,12 +249,12 @@ class VsUtilTests(unittest.TestCase):
         self.assertEqual(vsutil.scale(256, 16, 8, range_in=0, range=0, scale_offsets=True, chroma=False), 1)
         self.assertEqual(vsutil.scale(257, 16, 8, range_in=1, range=1, scale_offsets=True, chroma=False), 1)
         self.assertEqual(vsutil.scale(65535, 16, 8, range_in=1, range=0, scale_offsets=True, chroma=False), 235)
-        self.assertEqual(vsutil.scale(225<<8, 16, 8, range_in=0, range=1, scale_offsets=True, chroma=False), 255)
+        self.assertEqual(vsutil.scale(235 << 8, 16, 8, range_in=0, range=1, scale_offsets=True, chroma=False), 255)
 
         self.assertEqual(vsutil.scale(256, 16, 8, range_in=0, range=0, scale_offsets=True, chroma=True), 1)
         self.assertEqual(vsutil.scale(257, 16, 8, range_in=1, range=1, scale_offsets=True, chroma=True), 1)
         self.assertEqual(vsutil.scale(65535, 16, 8, range_in=1, range=0, scale_offsets=True, chroma=True), 240)
-        self.assertEqual(vsutil.scale(240<<8, 16, 8, range_in=0, range=1, scale_offsets=True, chroma=True), 255)
+        self.assertEqual(vsutil.scale(240 << 8, 16, 8, range_in=0, range=1, scale_offsets=True, chroma=True), 255)
 
         # flt to int
         self.assertEqual(vsutil.scale(1/219, 32, 8, range_in=1, range=0, scale_offsets=False, chroma=False), 1)
