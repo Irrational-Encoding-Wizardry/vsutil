@@ -173,6 +173,110 @@ class VsUtilTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Count cannot be negative.'):
             vsutil.iterate(2, double_number, -1)
 
+    def test_scale(self):
+        # no change
+        self.assertEqual(vsutil.scale(1, 8, 8, range_in=0, range=0), 1)
+        self.assertEqual(vsutil.scale(1, 8, 8, range_in=1, range=1), 1)
+        self.assertEqual(vsutil.scale(1, 32, 32, range_in=1, range=0), 1)
+        self.assertEqual(vsutil.scale(1, 32, 32, range_in=0, range=1), 1)
+
+        # range conversion
+        self.assertEqual(vsutil.scale(219, 8, 8, range_in=0, range=1, scale_offsets=False, chroma=False), 255)
+        self.assertEqual(vsutil.scale(255, 8, 8, range_in=1, range=0, scale_offsets=False, chroma=False), 219)
+
+        self.assertEqual(vsutil.scale(224, 8, 8, range_in=0, range=1, scale_offsets=False, chroma=True), 255)
+        self.assertEqual(vsutil.scale(255, 8, 8, range_in=1, range=0, scale_offsets=False, chroma=True), 224)
+
+        self.assertEqual(vsutil.scale(235, 8, 8, range_in=0, range=1, scale_offsets=True, chroma=False), 255)
+        self.assertEqual(vsutil.scale(255, 8, 8, range_in=1, range=0, scale_offsets=True, chroma=False), 235)
+
+        self.assertEqual(vsutil.scale(240, 8, 8, range_in=0, range=1, scale_offsets=True, chroma=True), 255)
+        self.assertEqual(vsutil.scale(255, 8, 8, range_in=1, range=0, scale_offsets=True, chroma=True), 240)
+
+        # int to int (upsample)
+        self.assertEqual(vsutil.scale(1, 8, 16, range_in=0, range=0, scale_offsets=False, chroma=False), 256)
+        self.assertEqual(vsutil.scale(1, 8, 16, range_in=1, range=1, scale_offsets=False, chroma=False), 257)
+        self.assertEqual(vsutil.scale(219, 8, 16, range_in=0, range=1, scale_offsets=False, chroma=False), 65535)
+        self.assertEqual(vsutil.scale(255, 8, 16, range_in=1, range=0, scale_offsets=False, chroma=False), 219 << 8)
+
+        self.assertEqual(vsutil.scale(1, 8, 16, range_in=0, range=0, scale_offsets=False, chroma=True), 256)
+        self.assertEqual(vsutil.scale(1, 8, 16, range_in=1, range=1, scale_offsets=False, chroma=True), 257)
+        self.assertEqual(vsutil.scale(224, 8, 16, range_in=0, range=1, scale_offsets=False, chroma=True), 65535)
+        self.assertEqual(vsutil.scale(255, 8, 16, range_in=1, range=0, scale_offsets=False, chroma=True), 224 << 8)
+
+        self.assertEqual(vsutil.scale(1, 8, 16, range_in=0, range=0, scale_offsets=True, chroma=False), 256)
+        self.assertEqual(vsutil.scale(1, 8, 16, range_in=1, range=1, scale_offsets=True, chroma=False), 257)
+        self.assertEqual(vsutil.scale(235, 8, 16, range_in=0, range=1, scale_offsets=True, chroma=False), 65535)
+        self.assertEqual(vsutil.scale(255, 8, 16, range_in=1, range=0, scale_offsets=True, chroma=False), 235 << 8)
+
+        self.assertEqual(vsutil.scale(1, 8, 16, range_in=0, range=0, scale_offsets=True, chroma=True), 256)
+        self.assertEqual(vsutil.scale(1, 8, 16, range_in=1, range=1, scale_offsets=True, chroma=True), 257)
+        self.assertEqual(vsutil.scale(240, 8, 16, range_in=0, range=1, scale_offsets=True, chroma=True), 65535)
+        self.assertEqual(vsutil.scale(255, 8, 16, range_in=1, range=0, scale_offsets=True, chroma=True), 240 << 8)
+
+        # int to flt
+        self.assertEqual(vsutil.scale(1, 8, 32, range_in=0, range=1, scale_offsets=False, chroma=False), 1/219)
+        self.assertEqual(vsutil.scale(1, 8, 32, range_in=1, range=1, scale_offsets=False, chroma=False), 1/255)
+        self.assertEqual(vsutil.scale(219, 8, 32, range_in=0, range=1, scale_offsets=False, chroma=False), 1)
+        self.assertEqual(vsutil.scale(255, 8, 32, range_in=1, range=1, scale_offsets=False, chroma=False), 1)
+
+        self.assertEqual(vsutil.scale(1, 8, 32, range_in=0, range=1, scale_offsets=False, chroma=True), 1/224)
+        self.assertEqual(vsutil.scale(1, 8, 32, range_in=1, range=1, scale_offsets=False, chroma=True), 1/255)
+        self.assertEqual(vsutil.scale(224, 8, 32, range_in=0, range=1, scale_offsets=False, chroma=True), 1)
+        self.assertEqual(vsutil.scale(255, 8, 32, range_in=1, range=1, scale_offsets=False, chroma=True), 1)
+
+        self.assertEqual(vsutil.scale(1, 8, 32, range_in=0, range=1, scale_offsets=True, chroma=False), -15/219)
+        self.assertEqual(vsutil.scale(1, 8, 32, range_in=1, range=1, scale_offsets=True, chroma=False), -15/255)
+        self.assertEqual(vsutil.scale(235, 8, 32, range_in=0, range=1, scale_offsets=True, chroma=False), 1)
+        self.assertEqual(vsutil.scale(255, 8, 32, range_in=1, range=1, scale_offsets=True, chroma=False), 1)
+
+        self.assertEqual(vsutil.scale(1, 8, 32, range_in=0, range=1, scale_offsets=True, chroma=True), -15/224)
+        self.assertEqual(vsutil.scale(1, 8, 32, range_in=1, range=1, scale_offsets=True, chroma=True), -15/255)
+        self.assertEqual(vsutil.scale(240, 8, 32, range_in=0, range=1, scale_offsets=True, chroma=True), 0.5)
+        self.assertEqual(vsutil.scale(255, 8, 32, range_in=1, range=1, scale_offsets=True, chroma=True), (255-128)/255)
+
+        # int to int (downsample)
+        self.assertEqual(vsutil.scale(256, 16, 8, range_in=0, range=0, scale_offsets=False, chroma=False), 1)
+        self.assertEqual(vsutil.scale(257, 16, 8, range_in=1, range=1, scale_offsets=False, chroma=False), 1)
+        self.assertEqual(vsutil.scale(65535, 16, 8, range_in=0, range=1, scale_offsets=False, chroma=False), 219)
+        self.assertEqual(vsutil.scale(219 << 8, 16, 8, range_in=1, range=0, scale_offsets=False, chroma=False), 255)
+
+        self.assertEqual(vsutil.scale(256, 16, 8, range_in=0, range=0, scale_offsets=False, chroma=True), 1)
+        self.assertEqual(vsutil.scale(257, 16, 8, range_in=1, range=1, scale_offsets=False, chroma=True), 1)
+        self.assertEqual(vsutil.scale(65535, 16, 8, range_in=0, range=1, scale_offsets=False, chroma=True), 224)
+        self.assertEqual(vsutil.scale(224<<8, 16, 8, range_in=1, range=0, scale_offsets=False, chroma=True), 255)
+
+        self.assertEqual(vsutil.scale(256, 16, 8, range_in=0, range=0, scale_offsets=True, chroma=False), 1)
+        self.assertEqual(vsutil.scale(257, 16, 8, range_in=1, range=1, scale_offsets=True, chroma=False), 1)
+        self.assertEqual(vsutil.scale(65535, 16, 8, range_in=0, range=1, scale_offsets=True, chroma=False), 235)
+        self.assertEqual(vsutil.scale(225<<8, 16, 8, range_in=1, range=0, scale_offsets=True, chroma=False), 255)
+
+        self.assertEqual(vsutil.scale(256, 16, 8, range_in=0, range=0, scale_offsets=True, chroma=True), 1)
+        self.assertEqual(vsutil.scale(257, 16, 8, range_in=1, range=1, scale_offsets=True, chroma=True), 1)
+        self.assertEqual(vsutil.scale(65535, 16, 8, range_in=0, range=1, scale_offsets=True, chroma=True), 240)
+        self.assertEqual(vsutil.scale(240<<8, 16, 8, range_in=1, range=0, scale_offsets=True, chroma=True), 255)
+
+        # flt to int
+        self.assertEqual(vsutil.scale(1/219, 32, 8, range_in=0, range=1, scale_offsets=False, chroma=False), 1)
+        self.assertEqual(vsutil.scale(1/255, 32, 8, range_in=1, range=1, scale_offsets=False, chroma=False), 1)
+        self.assertEqual(vsutil.scale(1, 32, 8, range_in=0, range=1, scale_offsets=False, chroma=False), 219)
+        self.assertEqual(vsutil.scale(1, 32, 8, range_in=1, range=1, scale_offsets=False, chroma=False), 255)
+
+        self.assertEqual(vsutil.scale(1/224, 32, 8, range_in=0, range=1, scale_offsets=False, chroma=True), 1)
+        self.assertEqual(vsutil.scale(1/255, 32, 8, range_in=1, range=1, scale_offsets=False, chroma=True), 1)
+        self.assertEqual(vsutil.scale(1, 32, 8, range_in=0, range=1, scale_offsets=False, chroma=True), 224)
+        self.assertEqual(vsutil.scale(1, 32, 8, range_in=1, range=1, scale_offsets=False, chroma=True), 255)
+
+        self.assertEqual(vsutil.scale(-15/219, 32, 8, range_in=0, range=1, scale_offsets=True, chroma=False), 1)
+        self.assertEqual(vsutil.scale(-15/255, 32, 8, range_in=1, range=1, scale_offsets=True, chroma=False), 1)
+        self.assertEqual(vsutil.scale(1, 32, 8, range_in=0, range=1, scale_offsets=True, chroma=False), 235)
+        self.assertEqual(vsutil.scale(1, 32, 8, range_in=1, range=1, scale_offsets=True, chroma=False), 255)
+
+        self.assertEqual(vsutil.scale(-15/224, 32, 8, range_in=0, range=1, scale_offsets=True, chroma=True), 1)
+        self.assertEqual(vsutil.scale(-15/255, 32, 8, range_in=1, range=1, scale_offsets=True, chroma=True), 1)
+        self.assertEqual(vsutil.scale(0.5, 32, 8, range_in=0, range=1, scale_offsets=True, chroma=True), 240)
+        self.assertEqual(vsutil.scale((255-128)/255, 32, 8, range_in=1, range=1, scale_offsets=True, chroma=True), 255)
+
     def test_depth(self):
         with self.assertRaisesRegex(ValueError, 'sample_type must be in'):
             vsutil.depth(self.RGB24_CLIP, 8, sample_type=2)
