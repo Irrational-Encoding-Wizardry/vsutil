@@ -43,6 +43,9 @@ class VsUtilTests(unittest.TestCase):
                          f'Same depth expected, was {clip_a.format.bits_per_sample} and {clip_b.format.bits_per_sample}.')
 
     def assert_same_length(self, clip_a: vs.VideoNode, clip_b: vs.VideoNode):
+        """
+        Assert that two clips have the same length
+        """
         self.assertEqual(len(clip_a), len(clip_b),
                          f'Same number of frames expected, was {len(clip_a)} and {len(clip_b)}.')
 
