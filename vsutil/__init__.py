@@ -7,7 +7,7 @@ __all__ = [
     # decorators
     'disallow_variable_format', 'disallow_variable_resolution',
     # misc non-vapoursynth related
-    'no_value', 'fallback', 'get_w', 'is_image', 'iterate',
+    'no_value', 'fallback', 'get_w', 'is_image', 'iterate', 'scale_value',
     # uses clip
     'get_depth', 'get_plane_size', 'get_subsampling',
     # returns/modifies clip
@@ -300,6 +300,59 @@ def is_image(filename: str, /) -> bool:
     return types_map.get(path.splitext(filename)[-1], '').startswith('image/')
 
 
+def scale_value(value: Union[int, float], 
+          input_depth: int, 
+          output_depth: int, 
+          range_in: Union[int, Range] = 0, 
+          range: Optional[Union[int, Range]] = None, 
+          scale_offsets: bool = False, 
+          chroma: bool = False) -> Union[int, float]:
+    """
+    Scales a given value between bit depths, sample types, and/or ranges.
+    :value:         Numeric value to be scaled
+    :input_depth:   Bit depth of the "value" parameter. Use 32 for float samples
+    :output_depth:  Bit depth to scale the input value to
+    :range_in:      Pixel range of the input value. No clamping is performed
+    :range:         Pixel range of the output value. No clamping is performed
+    :scale_offsets: Whether or not to apply YUV offsets to float chroma and/or TV range integer values
+                    e.g. when scaling a TV range value of 16 to float, setting this to True will return "0.0" rather than "0.073059.."
+    :chroma:        Whether to treat values as chroma instead of luma
+    """
+
+    range_in = _resolve_enum(Range, range_in, 'range_in')
+    range = _resolve_enum(Range, range, 'range')
+    range = fallback(range, range_in)
+
+    if input_depth == 32:
+        range_in = 1
+
+    if output_depth == 32:
+        range = 1
+
+    input_peak = _peak_pixel_value(input_depth, range_in, chroma)
+
+    output_peak = _peak_pixel_value(output_depth, range, chroma)
+
+    if input_depth == output_depth and range_in == range:
+        return value
+
+    if scale_offsets:
+        if output_depth == 32 and chroma:
+            value -= 128 << (input_depth - 8)
+        elif range and not range_in:
+            value -= 16 << (input_depth - 8)
+
+    value *= output_peak / input_peak
+
+    if scale_offsets:
+        if input_depth == 32 and chroma:
+            value += 128 << output_depth - 8
+        elif range_in and not range:
+            value += 16 << (output_depth - 8)
+
+    return value
+
+
 @disallow_variable_format
 def depth(clip: vs.VideoNode,
           bitdepth: int,
@@ -364,6 +417,14 @@ def _resolve_enum(enum: Type[E], value: Any, var_name: str, module: Optional[str
         return enum(value)
     except ValueError:
         raise ValueError(f'{var_name} must be in {_readable_enums(enum, module)}.') from None
+
+
+def _peak_pixel_value(bits: int, range: Union[int, Range], chroma: bool) -> int:
+    if bits == 32:
+        return 1
+    if range:
+        return (1 << bits) - 1
+    return (224 if chroma else 219) << (bits - 8)
 
 
 def _should_dither(in_bits: int,
