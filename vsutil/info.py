@@ -9,7 +9,7 @@ from typing import Optional, Tuple, TypeVar, Union
 
 import vapoursynth as vs
 
-from . import enums, func
+from . import func, types
 
 core = vs.core
 
@@ -92,8 +92,8 @@ def is_image(filename: str, /) -> bool:
 def scale_value(value: Union[int, float],
                 input_depth: int,
                 output_depth: int,
-                range_in: Union[int, enums.Range] = 0,
-                range: Optional[Union[int, enums.Range]] = None,
+                range_in: Union[int, types.Range] = 0,
+                range: Optional[Union[int, types.Range]] = None,
                 scale_offsets: bool = False,
                 chroma: bool = False,
                 ) -> Union[int, float]:
@@ -109,8 +109,8 @@ def scale_value(value: Union[int, float],
                     than "0.073059.."
     :chroma:        Whether to treat values as chroma instead of luma
     """
-    range_in = enums._resolve_enum(enums.Range, range_in, 'range_in')
-    range = enums._resolve_enum(enums.Range, range, 'range')
+    range_in = types._resolve_enum(types.Range, range_in, 'range_in')
+    range = types._resolve_enum(types.Range, range, 'range')
     range = func.fallback(range, range_in)
 
     if input_depth == 32:
@@ -119,7 +119,7 @@ def scale_value(value: Union[int, float],
     if output_depth == 32:
         range = 1
 
-    def peak_pixel_value(bits: int, range_: Union[int, enums.Range], chroma_: bool) -> int:
+    def peak_pixel_value(bits: int, range_: Union[int, types.Range], chroma_: bool) -> int:
         """
         _
         """

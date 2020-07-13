@@ -4,12 +4,12 @@ VSUtil. A collection of general-purpose VapourSynth functions to be reused in mo
 
 # export all public function directly
 from .clips import *
-from .enums import *
 from .func import *
 from .info import *
+from .types import *
 
 # for wildcard imports
-_mods = ['clips', 'enums', 'func', 'info']
+_mods = ['clips', 'func', 'info', 'types']
 
 __all__ = []
 for _pkg in _mods:

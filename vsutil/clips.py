@@ -7,7 +7,7 @@ from typing import List, Optional, Union
 
 import vapoursynth as vs
 
-from . import enums, func, info
+from . import func, info, types
 
 core = vs.core
 
@@ -18,9 +18,9 @@ def depth(clip: vs.VideoNode,
           /,
           sample_type: Optional[Union[int, vs.SampleType]] = None,
           *,
-          range: Optional[Union[int, enums.Range]] = None,
-          range_in: Optional[Union[int, enums.Range]] = None,
-          dither_type: Optional[Union[enums.Dither, str]] = None,
+          range: Optional[Union[int, types.Range]] = None,
+          range_in: Optional[Union[int, types.Range]] = None,
+          dither_type: Optional[Union[types.Dither, str]] = None,
           ) -> vs.VideoNode:
     """
     A bit depth converter only using core.resize and Format.replace.
@@ -37,10 +37,10 @@ def depth(clip: vs.VideoNode,
 
     :return: Converted clip with desired bit depth and sample type. ColorFamily will be same as input.
     """
-    sample_type = enums._resolve_enum(vs.SampleType, sample_type, 'sample_type', 'vapoursynth')
-    range = enums._resolve_enum(enums.Range, range, 'range')
-    range_in = enums._resolve_enum(enums.Range, range_in, 'range_in')
-    dither_type = enums._resolve_enum(enums.Dither, dither_type, 'dither_type')
+    sample_type = types._resolve_enum(vs.SampleType, sample_type, 'sample_type', 'vapoursynth')
+    range = types._resolve_enum(types.Range, range, 'range')
+    range_in = types._resolve_enum(types.Range, range_in, 'range_in')
+    dither_type = types._resolve_enum(types.Dither, dither_type, 'dither_type')
 
     curr_depth = info.get_depth(clip)
     sample_type = func.fallback(sample_type, vs.FLOAT if bitdepth == 32 else vs.INTEGER)
@@ -49,7 +49,7 @@ def depth(clip: vs.VideoNode,
         return clip
 
     should_dither = _should_dither(curr_depth, bitdepth, range_in, range, clip.format.sample_type, sample_type)
-    dither_type = func.fallback(dither_type, enums.Dither.ERROR_DIFFUSION if should_dither else enums.Dither.NONE)
+    dither_type = func.fallback(dither_type, types.Dither.ERROR_DIFFUSION if should_dither else types.Dither.NONE)
 
     new_format = clip.format.replace(bits_per_sample=bitdepth, sample_type=sample_type).id
 
@@ -144,8 +144,8 @@ def split(clip: vs.VideoNode, /) -> List[vs.VideoNode]:
 
 def _should_dither(in_bits: int,
                    out_bits: int,
-                   in_range: Optional[enums.Range] = None,
-                   out_range: Optional[enums.Range] = None,
+                   in_range: Optional[types.Range] = None,
+                   out_range: Optional[types.Range] = None,
                    in_sample_type: Optional[vs.SampleType] = None,
                    out_sample_type: Optional[vs.SampleType] = None,
                    ) -> bool:
@@ -178,5 +178,5 @@ def _should_dither(in_bits: int,
 
     return bool(range_conversion
                 or float_to_int
-                or (in_range == enums.Range.FULL and upsampling and (in_bits, out_bits) != (8, 16))
+                or (in_range == types.Range.FULL and upsampling and (in_bits, out_bits) != (8, 16))
                 or downsampling)
