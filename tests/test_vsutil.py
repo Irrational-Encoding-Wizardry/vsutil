@@ -1,5 +1,7 @@
 import unittest
+
 import vapoursynth as vs
+
 import vsutil
 
 
@@ -218,25 +220,25 @@ class VsUtilTests(unittest.TestCase):
         self.assertEqual(vsutil.scale_value(255, 8, 16, range_in=1, range=0, scale_offsets=True, chroma=True), 240 << 8)
 
         # int to flt
-        self.assertEqual(vsutil.scale_value(1, 8, 32, range_in=0, range=1, scale_offsets=False, chroma=False), 1/219)
-        self.assertEqual(vsutil.scale_value(1, 8, 32, range_in=1, range=1, scale_offsets=False, chroma=False), 1/255)
+        self.assertEqual(vsutil.scale_value(1, 8, 32, range_in=0, range=1, scale_offsets=False, chroma=False), 1 / 219)
+        self.assertEqual(vsutil.scale_value(1, 8, 32, range_in=1, range=1, scale_offsets=False, chroma=False), 1 / 255)
         self.assertEqual(vsutil.scale_value(219, 8, 32, range_in=0, range=1, scale_offsets=False, chroma=False), 1)
         self.assertEqual(vsutil.scale_value(255, 8, 32, range_in=1, range=1, scale_offsets=False, chroma=False), 1)
 
-        self.assertEqual(vsutil.scale_value(1, 8, 32, range_in=0, range=1, scale_offsets=False, chroma=True), 1/224)
-        self.assertEqual(vsutil.scale_value(1, 8, 32, range_in=1, range=1, scale_offsets=False, chroma=True), 1/255)
+        self.assertEqual(vsutil.scale_value(1, 8, 32, range_in=0, range=1, scale_offsets=False, chroma=True), 1 / 224)
+        self.assertEqual(vsutil.scale_value(1, 8, 32, range_in=1, range=1, scale_offsets=False, chroma=True), 1 / 255)
         self.assertEqual(vsutil.scale_value(224, 8, 32, range_in=0, range=1, scale_offsets=False, chroma=True), 1)
         self.assertEqual(vsutil.scale_value(255, 8, 32, range_in=1, range=1, scale_offsets=False, chroma=True), 1)
 
-        self.assertEqual(vsutil.scale_value(1, 8, 32, range_in=0, range=1, scale_offsets=True, chroma=False), (1-16)/219)
-        self.assertEqual(vsutil.scale_value(1, 8, 32, range_in=1, range=1, scale_offsets=True, chroma=False), 1/255)
+        self.assertEqual(vsutil.scale_value(1, 8, 32, range_in=0, range=1, scale_offsets=True, chroma=False), (1 - 16) / 219)
+        self.assertEqual(vsutil.scale_value(1, 8, 32, range_in=1, range=1, scale_offsets=True, chroma=False), 1 / 255)
         self.assertEqual(vsutil.scale_value(235, 8, 32, range_in=0, range=1, scale_offsets=True, chroma=False), 1)
         self.assertEqual(vsutil.scale_value(255, 8, 32, range_in=1, range=1, scale_offsets=True, chroma=False), 1)
 
-        self.assertEqual(vsutil.scale_value(1, 8, 32, range_in=0, range=1, scale_offsets=True, chroma=True), (1-128)/224)
-        self.assertEqual(vsutil.scale_value(1, 8, 32, range_in=1, range=1, scale_offsets=True, chroma=True), (1-128)/255)
+        self.assertEqual(vsutil.scale_value(1, 8, 32, range_in=0, range=1, scale_offsets=True, chroma=True), (1 - 128) / 224)
+        self.assertEqual(vsutil.scale_value(1, 8, 32, range_in=1, range=1, scale_offsets=True, chroma=True), (1 - 128) / 255)
         self.assertEqual(vsutil.scale_value(240, 8, 32, range_in=0, range=1, scale_offsets=True, chroma=True), 0.5)
-        self.assertEqual(vsutil.scale_value(255, 8, 32, range_in=1, range=1, scale_offsets=True, chroma=True), (255-128)/255)
+        self.assertEqual(vsutil.scale_value(255, 8, 32, range_in=1, range=1, scale_offsets=True, chroma=True), (255 - 128) / 255)
 
         # int to int (downsample)
         self.assertEqual(vsutil.scale_value(256, 16, 8, range_in=0, range=0, scale_offsets=False, chroma=False), 1)
@@ -247,7 +249,7 @@ class VsUtilTests(unittest.TestCase):
         self.assertEqual(vsutil.scale_value(256, 16, 8, range_in=0, range=0, scale_offsets=False, chroma=True), 1)
         self.assertEqual(vsutil.scale_value(257, 16, 8, range_in=1, range=1, scale_offsets=False, chroma=True), 1)
         self.assertEqual(vsutil.scale_value(65535, 16, 8, range_in=1, range=0, scale_offsets=False, chroma=True), 224)
-        self.assertEqual(vsutil.scale_value(224<<8, 16, 8, range_in=0, range=1, scale_offsets=False, chroma=True), 255)
+        self.assertEqual(vsutil.scale_value(224 << 8, 16, 8, range_in=0, range=1, scale_offsets=False, chroma=True), 255)
 
         self.assertEqual(vsutil.scale_value(256, 16, 8, range_in=0, range=0, scale_offsets=True, chroma=False), 1)
         self.assertEqual(vsutil.scale_value(257, 16, 8, range_in=1, range=1, scale_offsets=True, chroma=False), 1)
@@ -260,25 +262,25 @@ class VsUtilTests(unittest.TestCase):
         self.assertEqual(vsutil.scale_value(240 << 8, 16, 8, range_in=0, range=1, scale_offsets=True, chroma=True), 255)
 
         # flt to int
-        self.assertEqual(vsutil.scale_value(1/219, 32, 8, range_in=1, range=0, scale_offsets=False, chroma=False), 1)
-        self.assertEqual(vsutil.scale_value(1/255, 32, 8, range_in=1, range=1, scale_offsets=False, chroma=False), 1)
+        self.assertEqual(vsutil.scale_value(1 / 219, 32, 8, range_in=1, range=0, scale_offsets=False, chroma=False), 1)
+        self.assertEqual(vsutil.scale_value(1 / 255, 32, 8, range_in=1, range=1, scale_offsets=False, chroma=False), 1)
         self.assertEqual(vsutil.scale_value(1, 32, 8, range_in=1, range=0, scale_offsets=False, chroma=False), 219)
         self.assertEqual(vsutil.scale_value(1, 32, 8, range_in=1, range=1, scale_offsets=False, chroma=False), 255)
 
-        self.assertEqual(vsutil.scale_value(1/224, 32, 8, range_in=1, range=0, scale_offsets=False, chroma=True), 1)
-        self.assertEqual(vsutil.scale_value(1/255, 32, 8, range_in=1, range=1, scale_offsets=False, chroma=True), 1)
+        self.assertEqual(vsutil.scale_value(1 / 224, 32, 8, range_in=1, range=0, scale_offsets=False, chroma=True), 1)
+        self.assertEqual(vsutil.scale_value(1 / 255, 32, 8, range_in=1, range=1, scale_offsets=False, chroma=True), 1)
         self.assertEqual(vsutil.scale_value(1, 32, 8, range_in=1, range=0, scale_offsets=False, chroma=True), 224)
         self.assertEqual(vsutil.scale_value(1, 32, 8, range_in=1, range=1, scale_offsets=False, chroma=True), 255)
 
-        self.assertEqual(vsutil.scale_value((1-16)/219, 32, 8, range_in=1, range=0, scale_offsets=True, chroma=False), 1)
-        self.assertEqual(vsutil.scale_value(1/255, 32, 8, range_in=1, range=1, scale_offsets=True, chroma=False), 1)
+        self.assertEqual(vsutil.scale_value((1 - 16) / 219, 32, 8, range_in=1, range=0, scale_offsets=True, chroma=False), 1)
+        self.assertEqual(vsutil.scale_value(1 / 255, 32, 8, range_in=1, range=1, scale_offsets=True, chroma=False), 1)
         self.assertEqual(vsutil.scale_value(1, 32, 8, range_in=1, range=0, scale_offsets=True, chroma=False), 235)
         self.assertEqual(vsutil.scale_value(1, 32, 8, range_in=1, range=1, scale_offsets=True, chroma=False), 255)
 
-        self.assertEqual(vsutil.scale_value((1-128)/224, 32, 8, range_in=1, range=0, scale_offsets=True, chroma=True), 1)
-        self.assertEqual(vsutil.scale_value((1-128)/255, 32, 8, range_in=1, range=1, scale_offsets=True, chroma=True), 1)
+        self.assertEqual(vsutil.scale_value((1 - 128) / 224, 32, 8, range_in=1, range=0, scale_offsets=True, chroma=True), 1)
+        self.assertEqual(vsutil.scale_value((1 - 128) / 255, 32, 8, range_in=1, range=1, scale_offsets=True, chroma=True), 1)
         self.assertEqual(vsutil.scale_value(0.5, 32, 8, range_in=1, range=0, scale_offsets=True, chroma=True), 240)
-        self.assertEqual(vsutil.scale_value((255-128)/255, 32, 8, range_in=1, range=1, scale_offsets=True, chroma=True), 255)
+        self.assertEqual(vsutil.scale_value((255 - 128) / 255, 32, 8, range_in=1, range=1, scale_offsets=True, chroma=True), 255)
 
     def test_depth(self):
         with self.assertRaisesRegex(ValueError, 'sample_type must be in'):
@@ -319,39 +321,39 @@ class VsUtilTests(unittest.TestCase):
         self.assert_same_format(vsutil.depth(l_float_16_clip, 16, sample_type=vs.INTEGER), l_int_16_clip)
 
     def test_readable_enums(self):
-        self.assertEqual(vsutil._readable_enums(vsutil.Range), '<vsutil.Range.LIMITED: 0>, <vsutil.Range.FULL: 1>')
+        self.assertEqual(vsutil.types._readable_enums(vsutil.Range), '<vsutil.types.Range.LIMITED: 0>, <vsutil.types.Range.FULL: 1>')
 
     def test_resolve_enum(self):
-        self.assertEqual(vsutil._resolve_enum(vsutil.Range, None, 'test'), None)
-        self.assertEqual(vsutil._resolve_enum(vs.SampleType, 0, 'test', 'vapoursynth'), vs.SampleType(0))
+        self.assertEqual(vsutil.types._resolve_enum(vsutil.Range, None, 'test'), None)
+        self.assertEqual(vsutil.types._resolve_enum(vs.SampleType, 0, 'test', 'vapoursynth'), vs.SampleType(0))
 
         with self.assertRaisesRegex(ValueError, 'vapoursynth.ColorFamily'):
-            vsutil._resolve_enum(vs.ColorFamily, 2, 'test', 'vapoursynth')
+            vsutil.types._resolve_enum(vs.ColorFamily, 2, 'test', 'vapoursynth')
 
     def test_should_dither(self):
         # --- True ---
         # Range conversion
-        self.assertTrue(vsutil._should_dither(1, 1, in_range=vsutil.Range.LIMITED, out_range=vsutil.Range.FULL))
+        self.assertTrue(vsutil.clips._should_dither(1, 1, in_range=vsutil.Range.LIMITED, out_range=vsutil.Range.FULL))
         # Float to int
-        self.assertTrue(vsutil._should_dither(1, 1, in_sample_type=vs.FLOAT))
+        self.assertTrue(vsutil.clips._should_dither(1, 1, in_sample_type=vs.FLOAT))
         # Upsampling full range 10 -> 12
-        self.assertTrue(vsutil._should_dither(10, 12, in_range=vsutil.Range.FULL, out_range=vsutil.Range.FULL))
+        self.assertTrue(vsutil.clips._should_dither(10, 12, in_range=vsutil.Range.FULL, out_range=vsutil.Range.FULL))
         # Downsampling
-        self.assertTrue(vsutil._should_dither(10, 8, in_sample_type=vs.INTEGER))
-        self.assertTrue(vsutil._should_dither(10, 8, in_sample_type=vs.INTEGER, in_range=vsutil.Range.FULL, out_range=vsutil.Range.FULL))
-        self.assertTrue(vsutil._should_dither(10, 8, in_sample_type=vs.INTEGER, in_range=vsutil.Range.LIMITED, out_range=vsutil.Range.LIMITED))
+        self.assertTrue(vsutil.clips._should_dither(10, 8, in_sample_type=vs.INTEGER))
+        self.assertTrue(vsutil.clips._should_dither(10, 8, in_sample_type=vs.INTEGER, in_range=vsutil.Range.FULL, out_range=vsutil.Range.FULL))
+        self.assertTrue(vsutil.clips._should_dither(10, 8, in_sample_type=vs.INTEGER, in_range=vsutil.Range.LIMITED, out_range=vsutil.Range.LIMITED))
 
         # --- False ---
         # Int to int
-        self.assertFalse(vsutil._should_dither(8, 8, in_sample_type=vs.INTEGER))
+        self.assertFalse(vsutil.clips._should_dither(8, 8, in_sample_type=vs.INTEGER))
         # Upsampling full range 8 -> 16
-        self.assertFalse(vsutil._should_dither(8, 16, in_range=vsutil.Range.FULL, out_range=vsutil.Range.FULL))
+        self.assertFalse(vsutil.clips._should_dither(8, 16, in_range=vsutil.Range.FULL, out_range=vsutil.Range.FULL))
         # Upsampling
-        self.assertFalse(vsutil._should_dither(8, 16, in_sample_type=vs.INTEGER))
-        self.assertFalse(vsutil._should_dither(8, 16, in_sample_type=vs.INTEGER, in_range=vsutil.Range.LIMITED, out_range=vsutil.Range.LIMITED))
+        self.assertFalse(vsutil.clips._should_dither(8, 16, in_sample_type=vs.INTEGER))
+        self.assertFalse(vsutil.clips._should_dither(8, 16, in_sample_type=vs.INTEGER, in_range=vsutil.Range.LIMITED, out_range=vsutil.Range.LIMITED))
         # Float output
-        self.assertFalse(vsutil._should_dither(32, 32, in_sample_type=vs.INTEGER))
-        self.assertFalse(vsutil._should_dither(32, 16, in_sample_type=vs.INTEGER, out_sample_type=vs.FLOAT))
+        self.assertFalse(vsutil.clips._should_dither(32, 32, in_sample_type=vs.INTEGER))
+        self.assertFalse(vsutil.clips._should_dither(32, 16, in_sample_type=vs.INTEGER, out_sample_type=vs.FLOAT))
 
     def test_decorators(self):
         with self.assertRaisesRegex(ValueError, 'Variable-format'):
