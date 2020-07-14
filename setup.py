@@ -20,7 +20,7 @@ class DiscoverTest(test):
 
 setup(
     name='vsutil',
-    version='0.4.0',
+    version='0.5.0',
     packages=find_packages(exclude=['tests']),
     package_data={
         'vsutil': ['py.typed']
