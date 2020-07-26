@@ -35,5 +35,18 @@ setup(
     ],
     cmdclass={
         'test': DiscoverTest
-    }
+    },
+    python_requires='>=3.8',
+    project_urls={
+        'Documentation': 'http://vsutil.encode.moe/en/latest/',
+        'Source': 'https://github.com/Irrational-Encoding-Wizardry/vsutil',
+        'Tracker': 'https://github.com/Irrational-Encoding-Wizardry/vsutil/issues',
+    },
+    keywords='encoding vapoursynth video',
+    classifiers=[
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python",
+        "Topic :: Multimedia :: Video",
+        "Typing :: Typed",
+    ],
 )
