@@ -1,7 +1,7 @@
 vsutil
 ------
 
-|build| |discord|
+|build| |discord| |docs|
 
 .. |build| image:: https://github.com/Irrational-Encoding-Wizardry/vsutil/workflows/build/badge.svg
   :target: https://github.com/Irrational-Encoding-Wizardry/vsutil/actions?query=workflow%3Abuild+
@@ -11,7 +11,13 @@ vsutil
   :target: https://discord.gg/ZB7ZXbN
   :alt: Discord
 
+.. |docs| image:: https://readthedocs.org/projects/vsutil/badge/?version=latest
+:target: http://vsutil.encode.moe/en/latest/?badge=latest
+:alt: Documentation Status
+
 A collection of general-purpose VapourSynth functions to be reused in modules and scripts.
+
+See the `documentation <http://vsutil.encode.moe>` for more details on the included functions.
 
 The goal for vsutil is to allow authors of various "func" scripts to make use of premade helper functions instead of having to write their own.
 
