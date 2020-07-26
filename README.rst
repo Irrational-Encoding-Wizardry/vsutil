@@ -12,12 +12,10 @@ vsutil
   :alt: Discord
 
 .. |docs| image:: https://readthedocs.org/projects/vsutil/badge/?version=latest
-:target: http://vsutil.encode.moe/en/latest/?badge=latest
-:alt: Documentation Status
+  :target: http://vsutil.encode.moe/en/latest/?badge=latest
+  :alt: Documentation Status
 
 A collection of general-purpose VapourSynth functions to be reused in modules and scripts.
-
-See the `documentation <http://vsutil.encode.moe>` for more details on the included functions.
 
 The goal for vsutil is to allow authors of various "func" scripts to make use of premade helper functions instead of having to write their own.
 
