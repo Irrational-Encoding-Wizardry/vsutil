@@ -1,5 +1,5 @@
 """
-_
+Functions that modify/return a clip.
 """
 __all__ = ['depth', 'frame2clip', 'get_y', 'insert_clip', 'join', 'plane', 'split']
 
@@ -22,20 +22,34 @@ def depth(clip: vs.VideoNode,
           range_in: Optional[Union[int, types.Range]] = None,
           dither_type: Optional[Union[types.Dither, str]] = None,
           ) -> vs.VideoNode:
-    """
-    A bit depth converter only using core.resize and Format.replace.
-    By default, outputs FLOAT sample type for 32 bit and INTEGER for anything else.
+    """A bit depth converter only using ``vapoursynth.core.resize()`` and ``vapoursynth.Format.replace()``.
+    By default, outputs ``vapoursynth.FLOAT`` sample type for 32-bit and ``vapoursynth.INTEGER`` for anything else.
 
-    :param bitdepth:    Desired bits_per_sample of output clip.
-    :param sample_type: Desired sample_type of output clip. Allows overriding default FLOAT/INTEGER behavior. Accepts
-                        vapoursynth.SampleType enums INTEGER and FLOAT or their values, [0, 1].
-    :param range:       Output pixel range (defaults to input clip's range). See `Range`.
-    :param range_in:    Input pixel range (defaults to input clip's range). See `Range`.
-    :param dither_type: Dithering algorithm. Allows overriding default dithering behavior. See `Dither`.
-        Defaults to Floyd-Steinberg error diffusion when downsampling, converting between ranges, or upsampling full
-        range input. Defaults to 'none', or round to nearest, otherwise. See `_should_dither()` for more information.
+    >>> src_8 = vs.core.std.BlankClip(format=vs.YUV420P8)
+    >>> src_10 = depth(src_8, 10)
+    >>> src_10.format.name
+    'YUV420P10'
 
-    :return: Converted clip with desired bit depth and sample type. ColorFamily will be same as input.
+    >>> src2_10 = vs.core.std.BlankClip(format=vs.RGB30)
+    >>> src2_8 = depth(src2_10, 8, dither_type=Dither.RANDOM)  # override default dither behavior
+    >>> src2_8.format.name
+    'RGB24'
+
+    :param clip:         Input clip.
+    :param bitdepth:     Desired `bits_per_sample` of output clip.
+    :param sample_type:  Desired `sample_type` of output clip. Allows overriding default float/integer behavior.
+                         Accepts ``vapoursynth.SampleType`` enums ``vapoursynth.INTEGER`` and ``vapoursynth.FLOAT``
+                         or their values, ``0`` and ``1`` respectively.
+    :param range:        Output pixel range (defaults to input `clip`'s range). See :class:`Range`.
+    :param range_in:     Input pixel range (defaults to input `clip`'s range). See :class:`Range`.
+    :param dither_type:  Dithering algorithm. Allows overriding default dithering behavior. See :class:`Dither`.
+
+        Defaults to :attr:`Dither.ERROR_DIFFUSION`, or Floyd-Steinberg error diffusion, when downsampling,
+        converting between ranges, or upsampling full range input.
+        Defaults to :attr:`Dither.NONE`, or round to nearest, otherwise.
+        See `_should_dither()` comments for more information.
+
+    :return:             Converted clip with desired bit depth and sample type. ``ColorFamily`` will be same as input.
     """
     sample_type = types._resolve_enum(vs.SampleType, sample_type, 'sample_type', 'vapoursynth')
     range = types._resolve_enum(types.Range, range, 'range')
@@ -57,12 +71,12 @@ def depth(clip: vs.VideoNode,
 
 
 def frame2clip(frame: vs.VideoFrame, /, *, enforce_cache=True) -> vs.VideoNode:
-    """
-    Converts a VapourSynth frame to a clip.
+    """Converts a VapourSynth frame to a clip.
 
-    :param frame:         The frame to wrap.
-    :param enforce_cache: Always add a cache. (Even if the vapoursynth module has this feature disabled)
-    :return: A one-frame VideoNode that yields the frame passed to the function.
+    :param frame:          The frame to convert.
+    :param enforce_cache:  Forcibly add a cache, even if the ``vapoursynth`` module has this feature disabled.
+
+    :return: A one-frame clip that yields the `frame` passed to the function.
     """
     bc = core.std.BlankClip(
         width=frame.width,
@@ -84,10 +98,14 @@ def frame2clip(frame: vs.VideoFrame, /, *, enforce_cache=True) -> vs.VideoNode:
 
 @func.disallow_variable_format
 def get_y(clip: vs.VideoNode, /) -> vs.VideoNode:
-    """
-    Helper to get the luma of a VideoNode.
+    """Helper to get the luma plane of a clip.
 
-    If passed a single-plane vs.GRAY clip, it is assumed to be the luma and returned (no-op).
+    If passed a single-plane ``vapoursynth.GRAY`` clip, :func:`plane` will assume it to `be` the luma plane
+    itself and returns the `clip` (no-op).
+
+    :param clip: Input clip.
+
+    :return:     Luma plane of the input `clip`. Will return the input `clip` if it is a single-plane grayscale clip.
     """
     if clip.format.color_family not in (vs.YUV, vs.YCOCG, vs.GRAY):
         raise ValueError('The clip must have a luma plane.')
@@ -95,9 +113,16 @@ def get_y(clip: vs.VideoNode, /) -> vs.VideoNode:
 
 
 def insert_clip(clip: vs.VideoNode, /, insert: vs.VideoNode, start_frame: int) -> vs.VideoNode:
-    """
-    Convenience method to insert a shorter clip into a longer one.
-    The inserted clip cannot go beyond the last frame of the source clip or an exception is raised.
+    """Convenience method to insert a shorter clip into a longer one.
+
+    The `insert` clip cannot go beyond the last frame of the source `clip` or an exception is raised.
+    The `insert` clip frames replace the `clip` frames, unlike a normal splice-in.
+
+    :param clip:         Longer clip to insert shorter clip into.
+    :param insert:       Insert clip.
+    :param start_frame:  First frame of the longer `clip` to replace.
+
+    :return:             Longer clip with frames replaced by the shorter clip.
     """
     if start_frame == 0:
         return insert + clip[insert.num_frames:]
@@ -112,8 +137,15 @@ def insert_clip(clip: vs.VideoNode, /, insert: vs.VideoNode, start_frame: int) -
 
 
 def join(planes: List[vs.VideoNode], family: vs.ColorFamily = vs.YUV) -> vs.VideoNode:
-    """
-    Joins the supplied list of planes into a three-plane VideoNode (defaults to YUV).
+    """Joins the supplied list of planes into a three-plane VideoNode (defaults to YUV).
+
+    >>> planes = [Y, U, V]
+    >>> clip = join(planes)
+
+    :param planes:  List of 3 one-plane ``vapoursynth.GRAY`` clips to merge.
+    :param family:  Output color family. Must be a three-plane color family.
+
+    :return:        Three-plane clip of the supplied `planes`.
     """
     if family not in [vs.RGB, vs.YUV, vs.YCOCG]:
         raise ValueError('Color family must have 3 planes.')
@@ -122,12 +154,17 @@ def join(planes: List[vs.VideoNode], family: vs.ColorFamily = vs.YUV) -> vs.Vide
 
 @func.disallow_variable_format
 def plane(clip: vs.VideoNode, planeno: int, /) -> vs.VideoNode:
-    """
-    Extract the plane with the given index from the clip.
+    """Extracts the plane with the given index from the input clip.
+
+    If given a one-plane clip and ``planeno=0``, returns `clip` (no-op).
+
+    >>> src = vs.core.std.BlankClip(format=vs.YUV420P8)
+    >>> V = plane(src, 2)
 
     :param clip:     The clip to extract the plane from.
-    :param planeno:  The index that specifies which plane to extract.
-    :return: A grayscale clip that only contains the given plane.
+    :param planeno:  The index of which plane to extract.
+
+    :return:         A grayscale clip that only contains the given plane.
     """
     if clip.format.num_planes == 1 and planeno == 0:
         return clip
@@ -136,8 +173,14 @@ def plane(clip: vs.VideoNode, planeno: int, /) -> vs.VideoNode:
 
 @func.disallow_variable_format
 def split(clip: vs.VideoNode, /) -> List[vs.VideoNode]:
-    """
-    Returns a list of planes for the given input clip.
+    """Returns a list of planes (VideoNodes) from the given input clip.
+
+    >>> src = vs.core.std.BlankClip(format=vs.RGB27)
+    >>> R, G, B  = split(src)
+
+    :param clip:  Input clip.
+
+    :return:      List of planes from the input `clip`.
     """
     return [plane(clip, x) for x in range(clip.format.num_planes)]
 
