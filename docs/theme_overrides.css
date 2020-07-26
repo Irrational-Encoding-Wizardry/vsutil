@@ -1,0 +1,17 @@
+@media screen and (min-width:1100px) {
+    .wy-nav-content {
+        max-width: 1000px
+    }
+}
+
+.rst-content code,.rst-content tt {
+    font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace
+}
+
+.rst-content code.literal {
+    color: #595959
+}
+
+.rst-content .viewcode-back,.rst-content .viewcode-link,.rst-content a code.xref {
+    color: #007020
+}

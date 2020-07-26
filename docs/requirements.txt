@@ -1,0 +1,6 @@
+docutils
+Pygments
+pyparsing
+Sphinx
+sphinx-autodoc-typehints
+sphinx-rtd-theme
