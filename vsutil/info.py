@@ -1,5 +1,5 @@
 """
-_
+Functions that give information about clips or mathematical helpers.
 """
 __all__ = ['get_depth', 'get_plane_size', 'get_subsampling', 'get_w', 'is_image', 'scale_value']
 
@@ -19,19 +19,32 @@ T = TypeVar('T')
 
 @func.disallow_variable_format
 def get_depth(clip: vs.VideoNode, /) -> int:
-    """
-    Returns the bit depth of a VideoNode as an integer.
+    """Returns the bit depth of a VideoNode as an integer.
+
+    >>> src = vs.core.std.BlankClip(format=vs.YUV420P10)
+    >>> get_depth(src)
+    10
+
+    :param clip:  Input clip.
+
+    :return:      Bit depth of the input `clip`.
     """
     return clip.format.bits_per_sample
 
 
 def get_plane_size(frame: Union[vs.VideoFrame, vs.VideoNode], /, planeno: int) -> Tuple[int, int]:
-    """
-    Calculates the dimensions (w, h) of the desired plane.
+    """Calculates the dimensions (width, height) of the desired plane.
+
+    >>> src = vs.core.std.BlankClip(width=1920, height=1080, format=vs.YUV420P8)
+    >>> get_plane_size(src, 0)
+    (1920, 1080)
+    >>> get_plane_size(src, 1)
+    (960, 540)
 
     :param frame:    Can be a clip or frame.
     :param planeno:  The desired plane's index.
-    :return: (width, height)
+
+    :return:         Tuple of width and height of the desired plane.
     """
     # Add additional checks on VideoNodes as their size and format can be variable.
     if isinstance(frame, vs.VideoNode):
@@ -49,9 +62,19 @@ def get_plane_size(frame: Union[vs.VideoFrame, vs.VideoNode], /, planeno: int) -
 
 @func.disallow_variable_format
 def get_subsampling(clip: vs.VideoNode, /) -> Union[None, str]:
-    """
-    Returns the subsampling of a VideoNode in human-readable format.
-    Returns None for formats without subsampling.
+    """Returns the subsampling of a VideoNode in human-readable format.
+    Returns ``None`` for formats without subsampling.
+
+    >>> src1 = vs.core.std.BlankClip(format=vs.YUV420P8)
+    >>> get_subsampling(src1)
+    '420'
+    >>> src_rgb = vs.core.std.BlankClip(format=vs.RGB30)
+    >>> get_subsampling(src_rgb) is None
+    True
+
+    :param clip:  Input clip.
+
+    :return:      Subsampling of the input `clip` as a string (i.e. ``'420'``) or ``None``.
     """
     if clip.format.color_family not in (vs.YUV, vs.YCOCG):
         return None
@@ -72,9 +95,20 @@ def get_subsampling(clip: vs.VideoNode, /) -> Union[None, str]:
 
 
 def get_w(height: int, aspect_ratio: float = 16 / 9, *, only_even: bool = True) -> int:
-    """
-    Calculates the width for a clip with the given height and aspect ratio.
-    only_even is True by default because it imitates the math behind most standard resolutions (e.g. 854x480).
+    """Calculates the width for a clip with the given height and aspect ratio.
+
+    >>> get_w(720)
+    1280
+    >>> get_w(480)
+    854
+
+    :param height:        Input height.
+    :param aspect_ratio:  Aspect ratio for the calculation. (Default: ``16/9``)
+    :param only_even:     Will return the nearest even integer.
+                          ``True`` by default because it imitates the math behind most standard resolutions
+                          (e.g. 854x480).
+
+    :return:              Calculated width based on input `height`.
     """
     width = height * aspect_ratio
     if only_even:
@@ -83,8 +117,11 @@ def get_w(height: int, aspect_ratio: float = 16 / 9, *, only_even: bool = True) 
 
 
 def is_image(filename: str, /) -> bool:
-    """
-    Returns true if a filename refers to an image.
+    """Returns ``True`` if the filename refers to an image.
+
+    :param filename:  String representing a path to a file.
+
+    :return:          ``True`` if the `filename` is a path to an image file, otherwise ``False``.
     """
     return types_map.get(path.splitext(filename)[-1], '').startswith('image/')
 
@@ -97,17 +134,26 @@ def scale_value(value: Union[int, float],
                 scale_offsets: bool = False,
                 chroma: bool = False,
                 ) -> Union[int, float]:
-    """
-    Scales a given value between bit depths, sample types, and/or ranges.
-    :value:         Numeric value to be scaled
-    :input_depth:   Bit depth of the "value" parameter. Use 32 for float samples
-    :output_depth:  Bit depth to scale the input value to
-    :range_in:      Pixel range of the input value. No clamping is performed
-    :range:         Pixel range of the output value. No clamping is performed
-    :scale_offsets: Whether or not to apply YUV offsets to float chroma and/or TV range integer values
-                    e.g. when scaling a TV range value of 16 to float, setting this to True will return "0.0" rather
-                    than "0.073059.."
-    :chroma:        Whether to treat values as chroma instead of luma
+    """Scales a given numeric value between bit depths, sample types, and/or ranges.
+
+    >>> scale_value(16, 8, 32, range_in=Range.LIMITED)
+    0.0730593607305936
+    >>> scale_value(16, 8, 32, range_in=Range.LIMITED, scale_offsets=True)
+    0.0
+    >>> scale_value(16, 8, 32, range_in=Range.LIMITED, scale_offsets=True, chroma=True)
+    -0.5
+
+    :param value:          Numeric value to be scaled.
+    :param input_depth:    Bit depth of the `value` parameter. Use ``32`` for float sample type.
+    :param output_depth:   Bit depth to scale the input `value` to.
+    :param range_in:       Pixel range of the input `value`. No clamping is performed. See :class:`Range`.
+    :param range:          Pixel range of the output `value`. No clamping is performed. See :class:`Range`.
+    :param scale_offsets:  Whether or not to apply YUV offsets to float chroma and/or TV range integer values.
+        (When scaling a TV range value of ``16`` to float, setting this to ``True`` will return ``0.0``
+        rather than ``0.073059...``)
+    :param chroma:        Whether or not to treat values as chroma instead of luma.
+
+    :return:              Scaled numeric value.
     """
     range_in = types._resolve_enum(types.Range, range_in, 'range_in')
     range = types._resolve_enum(types.Range, range, 'range')
