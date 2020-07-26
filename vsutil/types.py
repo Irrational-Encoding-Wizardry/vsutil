@@ -12,20 +12,26 @@ E = TypeVar('E', bound=Enum)
 
 class Dither(str, Enum):
     """
-    enum for zimg_dither_type_e
+    Enumeration for `zimg_dither_type_e`.
     """
-    NONE =            'none'             # Round to nearest.
-    ORDERED =         'ordered'          # Bayer patterned dither.
-    RANDOM =          'random'           # Pseudo-random noise of magnitude 0.5.
-    ERROR_DIFFUSION = 'error_diffusion'  # Floyd-Steinberg error diffusion.
+    NONE = 'none'
+    """Round to nearest."""
+    ORDERED = 'ordered'
+    """Bayer patterned dither."""
+    RANDOM = 'random'
+    """Pseudo-random noise of magnitude 0.5."""
+    ERROR_DIFFUSION = 'error_diffusion'
+    """Floyd-Steinberg error diffusion."""
 
 
 class Range(int, Enum):
     """
-    enum for zimg_pixel_range_e
+    Enumeration for `zimg_pixel_range_e`.
     """
-    LIMITED = 0  # Studio (TV) legal range, 16-235 in 8 bits.
-    FULL =    1  # Full (PC) dynamic range, 0-255 in 8 bits.
+    LIMITED = 0
+    """Studio (TV) legal range, 16-235 in 8 bits."""
+    FULL = 1
+    """Full (PC) dynamic range, 0-255 in 8 bits."""
 
 
 def _readable_enums(enum: Type[Enum], module: Optional[str] = None) -> str:
