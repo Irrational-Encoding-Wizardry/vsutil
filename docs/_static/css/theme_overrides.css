@@ -6,10 +6,6 @@
     }
 }
 
-.rst-content code,.rst-content tt {
-    font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace
-}
-
 .rst-content code.literal {
     color: #595959
 }

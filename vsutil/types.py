@@ -12,7 +12,7 @@ E = TypeVar('E', bound=Enum)
 
 class Dither(str, Enum):
     """
-    Enumeration for `zimg_dither_type_e`.
+    Enum for `zimg_dither_type_e`.
     """
     NONE = 'none'
     """Round to nearest."""
@@ -26,7 +26,7 @@ class Dither(str, Enum):
 
 class Range(int, Enum):
     """
-    Enumeration for `zimg_pixel_range_e`.
+    Enum for `zimg_pixel_range_e`.
     """
     LIMITED = 0
     """Studio (TV) legal range, 16-235 in 8 bits."""
