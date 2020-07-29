@@ -1,5 +1,5 @@
 """
-Non-vapoursynth related functions and decorators.
+Decorators and non-VapourSynth-related functions.
 """
 __all__ = [
     # decorators
