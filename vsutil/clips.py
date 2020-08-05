@@ -140,7 +140,7 @@ def split(clip: vs.VideoNode, /) -> List[vs.VideoNode]:
     Returns a list of planes for the given input clip.
     """
     if clip.format.num_planes == 1:
-        return clip
+        return [clip]
     return [plane(clip, x) for x in range(clip.format.num_planes)]
 
 
