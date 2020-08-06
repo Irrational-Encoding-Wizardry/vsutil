@@ -113,8 +113,22 @@ def insert_clip(clip: vs.VideoNode, /, insert: vs.VideoNode, start_frame: int) -
 
 def join(planes: List[vs.VideoNode], family: vs.ColorFamily = vs.YUV) -> vs.VideoNode:
     """
-    Joins the supplied list of planes into a three-plane VideoNode (defaults to YUV).
+    Joins the supplied list of planes into a VideoNode containing the given planes.
+    
+    :param family: The color-family the resulting VideoNode will advertise.
+    :return: A VideoNode whose individual planes match the planes passed to this function.
     """
+    if len(planes) == 1:
+        # Equivalent to planes[0] but is supported by more types.
+        plane_clip = next(iter(planes))
+        if family != vs.GRAY:
+            raise ValueError('If passing only a single plane to join, the output family must be vs.GRAY')
+
+        # This should probably be an error to use join like this, but we let it pass.
+        if plane_clip.format.num_planes != 1:
+            plane_clip = plane(plane_clip, 0)
+        
+        return plane_clip
     if family not in [vs.RGB, vs.YUV, vs.YCOCG]:
         raise ValueError('Color family must have 3 planes.')
     return core.std.ShufflePlanes(clips=planes, planes=[0, 0, 0], colorfamily=family)
