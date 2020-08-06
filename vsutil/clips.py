@@ -3,6 +3,7 @@ _
 """
 __all__ = ['depth', 'frame2clip', 'get_y', 'insert_clip', 'join', 'plane', 'split']
 
+import warnings
 from typing import List, Optional, Union
 
 import vapoursynth as vs
@@ -111,10 +112,13 @@ def insert_clip(clip: vs.VideoNode, /, insert: vs.VideoNode, start_frame: int) -
     return pre + insert + post
 
 
-def join(planes: List[vs.VideoNode], family: vs.ColorFamily = vs.YUV) -> vs.VideoNode:
+def join(planes: List[vs.VideoNode], family: vs.ColorFamily = None) -> vs.VideoNode:
     """
     Joins the supplied list of planes into a three-plane VideoNode (defaults to YUV).
     """
+    if family is None:
+        warnings.warn(RuntimeWarning, "No family has been passed to vsutil.join, defaulting to YUV. This is an probably a bug if you use this function for per-plane processing.")
+        family = vs.YUV
     if family not in [vs.RGB, vs.YUV, vs.YCOCG]:
         raise ValueError('Color family must have 3 planes.')
     return core.std.ShufflePlanes(clips=planes, planes=[0, 0, 0], colorfamily=family)
