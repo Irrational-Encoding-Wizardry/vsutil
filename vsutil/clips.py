@@ -139,6 +139,11 @@ def split(clip: vs.VideoNode, /) -> List[vs.VideoNode]:
     """
     Returns a list of planes for the given input clip.
     """
+    if hasattr(clip.std, "SplitPlanes"):
+        planes = clip.std.SplitPlanes()
+        if isinstance(planes, vs.VideoNode):
+            planes = [planes]
+        return planes
     return [plane(clip, x) for x in range(clip.format.num_planes)]
 
 
