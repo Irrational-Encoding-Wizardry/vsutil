@@ -131,6 +131,13 @@ def plane(clip: vs.VideoNode, planeno: int, /) -> vs.VideoNode:
     """
     if clip.format.num_planes == 1 and planeno == 0:
         return clip
+
+    if hasattr(clip.std, "SplitPlanes"):
+        planes = clip.std.SplitPlanes()
+        if isinstance(planes, vs.VideoNode):
+            planes = [planes]
+        return planes[planeno]
+
     return core.std.ShufflePlanes(clip, planeno, vs.GRAY)
 
 
