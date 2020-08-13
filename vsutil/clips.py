@@ -133,10 +133,7 @@ def plane(clip: vs.VideoNode, planeno: int, /) -> vs.VideoNode:
         return clip
 
     if hasattr(clip.std, "SplitPlanes"):
-        planes = clip.std.SplitPlanes()
-        if isinstance(planes, vs.VideoNode):
-            planes = [planes]
-        return planes[planeno]
+        return clip.std.SplitPlanes()[planeno]
 
     return core.std.ShufflePlanes(clip, planeno, vs.GRAY)
 
