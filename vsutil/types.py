@@ -5,7 +5,7 @@ __all__ = ['Dither', 'Range']
 
 # this file only depends on the stdlib and should stay that way
 from enum import Enum
-from typing import Any, Optional, Type, TypeVar, Union
+from typing import Any, Callable, Optional, Type, TypeVar, Union
 
 E = TypeVar('E', bound=Enum)
 
@@ -45,7 +45,7 @@ def _readable_enums(enum: Type[Enum]) -> str:
         return ', '.join([repr(i) for i in enum])
 
 
-def _resolve_enum(enum: Type[E], value: Any, var_name: str, module: Optional[str] = None) -> Union[E, None]:
+def _resolve_enum(enum: Type[E], value: Any, var_name: str, fn: Optional[Callable] = None) -> Union[E, None]:
     """
     Attempts to evaluate `value` in `enum` if value is not None, otherwise returns None.
     Basically checks if a supplied enum value is valid and returns a readable error message
@@ -56,4 +56,4 @@ def _resolve_enum(enum: Type[E], value: Any, var_name: str, module: Optional[str
     try:
         return enum(value)
     except ValueError:
-        raise ValueError(f'{var_name} must be in {_readable_enums(enum, module)}.') from None
+        raise ValueError(f"{fn.__name__ + ': ' if fn else ''}{var_name} must be in {_readable_enums(enum)}.") from None
