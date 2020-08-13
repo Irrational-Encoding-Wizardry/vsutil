@@ -51,10 +51,10 @@ def depth(clip: vs.VideoNode,
 
     :return:             Converted clip with desired bit depth and sample type. ``ColorFamily`` will be same as input.
     """
-    sample_type = types._resolve_enum(vs.SampleType, sample_type, 'sample_type', 'vapoursynth')
-    range = types._resolve_enum(types.Range, range, 'range')
-    range_in = types._resolve_enum(types.Range, range_in, 'range_in')
-    dither_type = types._resolve_enum(types.Dither, dither_type, 'dither_type')
+    sample_type = types._resolve_enum(vs.SampleType, sample_type, 'sample_type', depth)
+    range = types._resolve_enum(types.Range, range, 'range', depth)
+    range_in = types._resolve_enum(types.Range, range_in, 'range_in', depth)
+    dither_type = types._resolve_enum(types.Dither, dither_type, 'dither_type', depth)
 
     curr_depth = info.get_depth(clip)
     sample_type = func.fallback(sample_type, vs.FLOAT if bitdepth == 32 else vs.INTEGER)
