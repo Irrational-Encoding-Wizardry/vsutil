@@ -321,14 +321,14 @@ class VsUtilTests(unittest.TestCase):
         self.assert_same_format(vsutil.depth(l_float_16_clip, 16, sample_type=vs.INTEGER), l_int_16_clip)
 
     def test_readable_enums(self):
-        self.assertEqual(vsutil.types._readable_enums(vsutil.Range), '<vsutil.types.Range.LIMITED: 0>, <vsutil.types.Range.FULL: 1>')
+        self.assertEqual(vsutil.types._readable_enums(vsutil.Range), '<vsutil.Range.LIMITED: 0>, <vsutil.Range.FULL: 1>')
 
     def test_resolve_enum(self):
         self.assertEqual(vsutil.types._resolve_enum(vsutil.Range, None, 'test'), None)
-        self.assertEqual(vsutil.types._resolve_enum(vs.SampleType, 0, 'test', 'vapoursynth'), vs.SampleType(0))
+        self.assertEqual(vsutil.types._resolve_enum(vs.SampleType, 0, 'test'), vs.SampleType(0))
 
-        with self.assertRaisesRegex(ValueError, 'vapoursynth.ColorFamily'):
-            vsutil.types._resolve_enum(vs.ColorFamily, 2, 'test', 'vapoursynth')
+        with self.assertRaisesRegex(ValueError, 'vapoursynth.GRAY'):
+            vsutil.types._resolve_enum(vs.ColorFamily, 2, 'test')
 
     def test_should_dither(self):
         # --- True ---
