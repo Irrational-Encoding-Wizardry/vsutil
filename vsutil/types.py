@@ -40,12 +40,15 @@ class Range(int, _NoSubmoduleRepr):
     """Full (PC) dynamic range, 0-255 in 8 bits."""
 
 
-def _readable_enums(enum: Type[Enum], module: Optional[str] = None) -> str:
+def _readable_enums(enum: Type[Enum]) -> str:
     """
-    Returns a list of all possible values in `module.enum`.
-    Extends the default `repr(enum.value)` behavior by prefixing the enum with the name of the module it belongs to.
+    Returns a list of all possible values in `enum`.
+    Since VapourSynth imported enums don't carry the correct module name, use a special case for them.
     """
-    return ', '.join([f'<{module if module else enum.__module__}.{str(e)}: {e.value}>' for e in enum])
+    if 'importlib' in enum.__module__:
+        return ', '.join([f'<vapoursynth.{i.name}: {i.value}>' for i in enum])
+    else:
+        return ', '.join([repr(i) for i in enum])
 
 
 def _resolve_enum(enum: Type[E], value: Any, var_name: str, module: Optional[str] = None) -> Union[E, None]:
