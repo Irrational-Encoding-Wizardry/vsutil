@@ -10,13 +10,13 @@ from typing import Any, Callable, Optional, Type, TypeVar, Union
 E = TypeVar('E', bound=Enum)
 
 
-class _NoSubmoduleRepr(Enum):
+class _NoSubmoduleRepr:
     def __repr__(self):
         """Removes submodule name from standard repr, helpful since we re-export everything at the top-level."""
         return '<%s.%s.%s: %r>' % (self.__module__.split('.')[0], self.__class__.__name__, self.name, self.value)
 
 
-class Dither(str, _NoSubmoduleRepr):
+class Dither(_NoSubmoduleRepr, str, Enum):
     """
     Enum for `zimg_dither_type_e`.
     """
@@ -30,7 +30,7 @@ class Dither(str, _NoSubmoduleRepr):
     """Floyd-Steinberg error diffusion."""
 
 
-class Range(int, _NoSubmoduleRepr):
+class Range(_NoSubmoduleRepr, int, Enum):
     """
     Enum for `zimg_pixel_range_e`.
     """
