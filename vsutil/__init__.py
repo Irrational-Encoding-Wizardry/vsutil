@@ -14,3 +14,8 @@ _mods = ['clips', 'func', 'info', 'types']
 __all__ = []
 for _pkg in _mods:
     __all__ += __import__(__name__ + '.' + _pkg, fromlist=_mods).__all__
+
+try:
+    from ._metadata import __author__, __version__
+except ImportError:
+    __author__ = __version__ = 'unknown'

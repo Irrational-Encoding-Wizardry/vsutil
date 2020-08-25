@@ -15,6 +15,9 @@ import sys
 
 sys.path.insert(0, os.path.abspath('..'))
 
+meta = {}
+exec(open(os.path.abspath('../vsutil/_metadata.py')).read(), meta)
+
 
 # -- Project information -----------------------------------------------------
 
@@ -23,7 +26,7 @@ copyright = '2020, Irrational Encoding Wizardry'
 author = 'Irrational Encoding Wizardry'
 
 # The full version, including alpha/beta/rc tags
-version = release = '0.5.0'
+version = release = meta['__version__']
 
 
 # -- General configuration ---------------------------------------------------
