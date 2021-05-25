@@ -61,6 +61,21 @@ def get_plane_size(frame: Union[vs.VideoFrame, vs.VideoNode], /, planeno: int) -
 
 
 @func.disallow_variable_format
+def get_sample_type(clip: vs.VideoNode, /) -> vs.SampleType:
+    """Returns the sample type of a VideoNode as an SampleType.
+
+    >>> src = vs.core.std.BlankClip(format=vs.YUV420P16)
+    >>> get_sample_type(src)
+    <SampleType.INTEGER: 0>
+
+    :param clip:  Input clip.
+
+    :return:      Sample type of the input `clip`.
+    """
+    return clip.format.sample_type
+
+
+@func.disallow_variable_format
 def get_subsampling(clip: vs.VideoNode, /) -> Union[None, str]:
     """Returns the subsampling of a VideoNode in human-readable format.
     Returns ``None`` for formats without subsampling.
