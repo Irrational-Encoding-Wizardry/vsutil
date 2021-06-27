@@ -6,7 +6,6 @@ __all__ = ['Dither', 'Range', 'EXPR_VARS']
 # this file only depends on the stdlib and should stay that way
 from enum import Enum
 
-import typing
 from typing import Any, Callable, Optional, Type, TypeVar, Union
 
 E = TypeVar('E', bound=Enum)
