@@ -1,7 +1,7 @@
 """
 Enums and related functions.
 """
-__all__ = ['Dither', 'Range', 'EXPR_VAR_NAMES']
+__all__ = ['Dither', 'Range', 'EXPR_VARS']
 
 # this file only depends on the stdlib and should stay that way
 from enum import Enum
