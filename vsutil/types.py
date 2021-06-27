@@ -5,7 +5,9 @@ __all__ = ['Dither', 'Range', 'EXPR_VARS']
 
 # this file only depends on the stdlib and should stay that way
 from enum import Enum
-from typing import Any, Callable, Optional, Type, TypeVar, Union, Literal
+
+import typing
+from typing import Any, Callable, Optional, Type, TypeVar, Union
 
 E = TypeVar('E', bound=Enum)
 
@@ -40,7 +42,7 @@ class Range(_NoSubmoduleRepr, int, Enum):
     """Full (PC) dynamic range, 0-255 in 8 bits."""
 
 
-EXPR_VARS: Literal['xyzabcdefghijklmnopqrstuvw']  = 'xyzabcdefghijklmnopqrstuvw'
+EXPR_VARS: str = 'xyzabcdefghijklmnopqrstuvw'
 """
 This constant contains a list of all variables that can appear inside an expr-string ordered
 by assignment. So the first clip will have the name EXPR_VAR_NAMES[0], the second one will
