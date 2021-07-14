@@ -5,6 +5,15 @@ Version History
 .. automodule:: vsutil
    :noindex:
 
+0.6.0
+-----
+
+..
+
+- Add constant for std.Expr variables
+- Lots of documentation changes
+- Improve internal enum usage
+
 0.5.0
 -----
 
