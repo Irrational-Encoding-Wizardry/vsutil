@@ -76,7 +76,7 @@ def get_subsampling(clip: vs.VideoNode, /) -> Union[None, str]:
 
     :return:      Subsampling of the input `clip` as a string (i.e. ``'420'``) or ``None``.
     """
-    if clip.format.color_family not in (vs.YUV, vs.YCOCG):
+    if clip.format.color_family not in (vs.YUV):
         return None
     if clip.format.subsampling_w == 1 and clip.format.subsampling_h == 1:
         return '420'

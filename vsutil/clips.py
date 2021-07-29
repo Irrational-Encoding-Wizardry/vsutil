@@ -107,7 +107,7 @@ def get_y(clip: vs.VideoNode, /) -> vs.VideoNode:
 
     :return:     Luma plane of the input `clip`. Will return the input `clip` if it is a single-plane grayscale clip.
     """
-    if clip.format.color_family not in (vs.YUV, vs.YCOCG, vs.GRAY):
+    if clip.format.color_family not in (vs.YUV, vs.GRAY):
         raise ValueError('The clip must have a luma plane.')
     return plane(clip, 0)
 
@@ -147,7 +147,7 @@ def join(planes: List[vs.VideoNode], family: vs.ColorFamily = vs.YUV) -> vs.Vide
 
     :return:        Three-plane clip of the supplied `planes`.
     """
-    if family not in [vs.RGB, vs.YUV, vs.YCOCG]:
+    if family not in [vs.RGB, vs.YUV]:
         raise ValueError('Color family must have 3 planes.')
     return core.std.ShufflePlanes(clips=planes, planes=[0, 0, 0], colorfamily=family)
 
