@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        vs-version: [latest, 50, 49]
+        vs-version: [latest, 50]
         python-version: [3.8]
 
     steps:
