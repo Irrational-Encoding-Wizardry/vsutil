@@ -4,10 +4,15 @@ Enums and related functions.
 __all__ = ['Dither', 'Range', 'EXPR_VARS']
 
 # this file only depends on the stdlib and should stay that way
-from enum import Enum
+from enum import Enum, auto
 from typing import Any, Callable, Optional, Type, TypeVar, Union
 
 E = TypeVar('E', bound=Enum)
+
+
+class _Unknown(Enum):
+    VALUE = auto()
+Unknown: Any = _Unknown.VALUE
 
 
 class _NoSubmoduleRepr:
