@@ -78,6 +78,10 @@ def frame2clip(frame: vs.VideoFrame, /, *, enforce_cache=True) -> vs.VideoNode:
 
     :return: A one-frame clip that yields the `frame` passed to the function.
     """
+    if enforce_cache is not True:
+        import warnings
+        warnings.warn("enforce_cache is deprecated.", DeprecationWarning)
+
     bc = core.std.BlankClip(
         width=frame.width,
         height=frame.height,
@@ -88,12 +92,6 @@ def frame2clip(frame: vs.VideoFrame, /, *, enforce_cache=True) -> vs.VideoNode:
     )
     frame = frame.copy()
     result = bc.std.ModifyFrame([bc], lambda n, f: frame.copy())
-
-    if hasattr(core, "add_cache"):
-        # Forcefully add a cache to Modify-Frame if caching is disabled on the core.
-        # This will ensure that the filter will not include GIL characteristics.
-        if not core.add_cache and enforce_cache:
-            result = result.std.Cache(size=1, fixed=True)
     return result
 
 
