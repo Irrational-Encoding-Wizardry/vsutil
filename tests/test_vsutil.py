@@ -78,7 +78,7 @@ class VsUtilTests(unittest.TestCase):
         # let’s create a custom format with higher subsampling than any of the legal ones to test that branch as well:
         with self.assertRaisesRegex(ValueError, 'Unknown subsampling.'):
             vsutil.get_subsampling(
-                vs.core.std.BlankClip(_format=self.YUV444P8_CLIP.format.replace(subsampling_w=4))
+                vs.core.std.BlankClip(format_=self.YUV444P8_CLIP.format.replace(subsampling_w=4))
             )
 
     def test_get_depth(self):
@@ -146,15 +146,17 @@ class VsUtilTests(unittest.TestCase):
         frame = self.WHITE_SAMPLE_CLIP.get_frame(0)
         clip = vsutil.frame2clip(frame)
         self.assert_same_frame(self.WHITE_SAMPLE_CLIP, clip)
+
         # specifically test the path with disabled cache
-        try:
-            vs.core.add_cache = False
-            black_frame = self.BLACK_SAMPLE_CLIP.get_frame(0)
-            black_clip = vsutil.frame2clip(black_frame)
-            self.assert_same_frame(self.BLACK_SAMPLE_CLIP, black_clip)
-        # reset state of the core for further tests
-        finally:
-            vs.core.add_cache = True
+        if hasattr(vs.core, "add_cache"):
+            try:
+                vs.core.add_cache = False
+                black_frame = self.BLACK_SAMPLE_CLIP.get_frame(0)
+                black_clip = vsutil.frame2clip(black_frame)
+                self.assert_same_frame(self.BLACK_SAMPLE_CLIP, black_clip)
+            # reset state of the core for further tests
+            finally:
+                vs.core.add_cache = True
 
     def test_is_image(self):
         """These are basically tests for the mime types, but I want the coverage. rooDerp"""
@@ -328,7 +330,7 @@ class VsUtilTests(unittest.TestCase):
         self.assertEqual(vsutil.types._resolve_enum(vs.SampleType, 0, 'test'), vs.SampleType(0))
 
         with self.assertRaisesRegex(ValueError, 'vapoursynth.GRAY'):
-            vsutil.types._resolve_enum(vs.ColorFamily, 2, 'test')
+            vsutil.types._resolve_enum(vs.ColorFamily, 999, 'test')
 
     def test_should_dither(self):
         # --- True ---
