@@ -147,17 +147,6 @@ class VsUtilTests(unittest.TestCase):
         clip = vsutil.frame2clip(frame)
         self.assert_same_frame(self.WHITE_SAMPLE_CLIP, clip)
 
-        # specifically test the path with disabled cache
-        if hasattr(vs.core, "add_cache"):
-            try:
-                vs.core.add_cache = False
-                black_frame = self.BLACK_SAMPLE_CLIP.get_frame(0)
-                black_clip = vsutil.frame2clip(black_frame)
-                self.assert_same_frame(self.BLACK_SAMPLE_CLIP, black_clip)
-            # reset state of the core for further tests
-            finally:
-                vs.core.add_cache = True
-
     def test_is_image(self):
         """These are basically tests for the mime types, but I want the coverage. rooDerp"""
         self.assertEqual(vsutil.is_image('something.png'), True)
