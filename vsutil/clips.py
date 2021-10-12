@@ -3,7 +3,7 @@ Functions that modify/return a clip.
 """
 __all__ = ['depth', 'frame2clip', 'get_y', 'insert_clip', 'join', 'plane', 'split']
 
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Any
 
 import vapoursynth as vs
 
@@ -70,7 +70,10 @@ def depth(clip: vs.VideoNode,
     return clip.resize.Point(format=new_format, range=range, range_in=range_in, dither_type=dither_type)
 
 
-def frame2clip(frame: vs.VideoFrame, /, *, enforce_cache=True) -> vs.VideoNode:
+_unused: Any = []
+
+
+def frame2clip(frame: vs.VideoFrame, /, *, enforce_cache=_unused) -> vs.VideoNode:
     """Converts a VapourSynth frame to a clip.
 
     :param frame:          The frame to convert.
@@ -78,7 +81,7 @@ def frame2clip(frame: vs.VideoFrame, /, *, enforce_cache=True) -> vs.VideoNode:
 
     :return: A one-frame clip that yields the `frame` passed to the function.
     """
-    if enforce_cache is not True:
+    if enforce_cache is not _unused:
         import warnings
         warnings.warn("enforce_cache is deprecated.", DeprecationWarning)
 
