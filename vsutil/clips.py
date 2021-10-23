@@ -184,7 +184,9 @@ def split(clip: vs.VideoNode, /) -> List[vs.VideoNode]:
 
     :return:      List of planes from the input `clip`.
     """
-    return [plane(clip, x) for x in range(clip.format.num_planes)]
+    import warnings
+    warnings.warn("vsutil.split is deprecated in favor of the newly-introduced std.SplitPlanes", DeprecationWarning)
+    return core.std.SplitPlanes(clip)
 
 
 def _should_dither(in_bits: int,
