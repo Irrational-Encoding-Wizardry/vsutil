@@ -3,8 +3,7 @@ Functions that modify/return a clip.
 """
 __all__ = ['depth', 'frame2clip', 'get_y', 'insert_clip', 'join', 'plane', 'split']
 
-from collections.abc import Sequence
-from typing import Any, List, Optional, Union, cast
+from typing import Any, List, Optional, Sequence, Union, cast
 
 import vapoursynth as vs
 
