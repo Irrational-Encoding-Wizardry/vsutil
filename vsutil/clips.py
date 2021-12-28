@@ -178,13 +178,13 @@ def split(clip: vs.VideoNode, /) -> List[vs.VideoNode]:
     """Returns a list of planes (VideoNodes) from the given input clip.
 
     >>> src = vs.core.std.BlankClip(format=vs.RGB27)
-    >>> R, G, B  = split(src)
+    >>> R, G, B = split(src)
 
     :param clip:  Input clip.
 
     :return:      List of planes from the input `clip`.
     """
-    return [plane(clip, x) for x in range(clip.format.num_planes)]
+    return [clip] if clip.format.num_planes == 1 else cast(List[vs.VideoNode], clip.std.SplitPlanes())
 
 
 def _should_dither(in_bits: int,
