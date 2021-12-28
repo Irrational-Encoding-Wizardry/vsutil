@@ -150,9 +150,8 @@ def join(planes: Sequence[vs.VideoNode], family: vs.ColorFamily = vs.YUV) -> vs.
 
     :return:        Three-plane clip of the supplied `planes`.
     """
-    if family not in [vs.RGB, vs.YUV]:
-        raise ValueError('Color family must have 3 planes.')
-    return core.std.ShufflePlanes(clips=planes, planes=[0, 0, 0], colorfamily=family)
+    return planes[0] if len(planes) == 1 and family == vs.GRAY \
+        else core.std.ShufflePlanes(planes, [0, 0, 0], family)
 
 
 @func.disallow_variable_format
