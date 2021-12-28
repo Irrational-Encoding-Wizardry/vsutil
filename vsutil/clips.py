@@ -3,7 +3,8 @@ Functions that modify/return a clip.
 """
 __all__ = ['depth', 'frame2clip', 'get_y', 'insert_clip', 'join', 'plane', 'split']
 
-from typing import List, Optional, Union, Any
+from collections.abc import Sequence
+from typing import Any, List, Optional, Union, cast
 
 import vapoursynth as vs
 
@@ -138,13 +139,13 @@ def insert_clip(clip: vs.VideoNode, /, insert: vs.VideoNode, start_frame: int) -
     return pre + insert + post
 
 
-def join(planes: List[vs.VideoNode], family: vs.ColorFamily = vs.YUV) -> vs.VideoNode:
+def join(planes: Sequence[vs.VideoNode], family: vs.ColorFamily = vs.YUV) -> vs.VideoNode:
     """Joins the supplied list of planes into a three-plane VideoNode (defaults to YUV).
 
     >>> planes = [Y, U, V]
     >>> clip = join(planes)
 
-    :param planes:  List of 3 one-plane ``vapoursynth.GRAY`` clips to merge.
+    :param planes:  Sequence of 3 one-plane ``vapoursynth.GRAY`` clips to merge.
     :param family:  Output color family. Must be a three-plane color family.
 
     :return:        Three-plane clip of the supplied `planes`.
