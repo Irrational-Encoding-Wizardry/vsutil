@@ -197,3 +197,21 @@ def scale_value(value: Union[int, float],
             value += 16 << (output_depth - 8)
 
     return value
+
+
+def get_lowest_value(clip: vs.VideoNode, chroma: bool = False) -> float:
+    is_float = clip.format.sample_type == vs.FLOAT
+
+    return -0.5 if chroma and is_float else 0
+
+
+def get_neutral_value(clip: vs.VideoNode, chroma: bool = False) -> float:
+    is_float = clip.format.sample_type == vs.FLOAT
+
+    return (0 if chroma else 1) if is_float else get_peak_value(clip) // 2
+
+
+def get_peak_value(clip: vs.VideoNode, chroma: bool = False) -> float:
+    is_float = clip.format.sample_type == vs.FLOAT
+
+    return 0.5 if chroma else 1 if is_float else (1 << get_depth(clip)) - 1
