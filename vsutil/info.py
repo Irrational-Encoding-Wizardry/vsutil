@@ -1,7 +1,7 @@
 """
 Functions that give information about clips or mathematical helpers.
 """
-__all__ = ['get_depth', 'get_plane_size', 'get_subsampling', 'get_w', 'is_image', 'scale_value']
+__all__ = ['get_depth', 'get_plane_size', 'get_subsampling', 'get_w', 'is_image', 'scale_value', 'get_lowest_value', 'get_neutral_value', 'get_peak_value']
 
 from mimetypes import types_map
 from os import path
