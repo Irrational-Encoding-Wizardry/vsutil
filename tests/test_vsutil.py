@@ -276,26 +276,26 @@ class VsUtilTests(unittest.TestCase):
     def test_get_lowest_value(self):
         FLOAT_CLIP = self.YUV420P8_CLIP.resize.Point(format=self.YUV420P8_CLIP.format.replace(bits_per_sample=32, sample_type=vs.FLOAT))
 
-        self.assertEqual(vsutil.get_lowest_value(self.YUV420P8_CLIP, False), 0)
-        self.assertEqual(vsutil.get_lowest_value(self.YUV420P8_CLIP, True), 0)
+        self.assertEqual(vsutil.get_lowest_value(self.YUV420P8_CLIP, False), 0.)
+        self.assertEqual(vsutil.get_lowest_value(self.YUV420P8_CLIP, True), 0.)
 
-        self.assertEqual(vsutil.get_lowest_value(FLOAT_CLIP, False), 0)
+        self.assertEqual(vsutil.get_lowest_value(FLOAT_CLIP, False), 0.)
         self.assertEqual(vsutil.get_lowest_value(FLOAT_CLIP, True), -0.5)
 
     def test_get_neutral_value(self):
         FLOAT_CLIP = self.YUV420P8_CLIP.resize.Point(format=self.YUV420P8_CLIP.format.replace(bits_per_sample=32, sample_type=vs.FLOAT))
 
-        self.assertEqual(vsutil.get_neutral_value(self.YUV420P8_CLIP, False), 128)
-        self.assertEqual(vsutil.get_neutral_value(self.YUV420P8_CLIP, True), 128)
+        self.assertEqual(vsutil.get_neutral_value(self.YUV420P8_CLIP, False), 128.)
+        self.assertEqual(vsutil.get_neutral_value(self.YUV420P8_CLIP, True), 128.)
 
         self.assertEqual(vsutil.get_neutral_value(FLOAT_CLIP, False), 0.5)
-        self.assertEqual(vsutil.get_neutral_value(FLOAT_CLIP, True), 0)
+        self.assertEqual(vsutil.get_neutral_value(FLOAT_CLIP, True), 0.)
 
     def test_get_peak_value(self):
         FLOAT_CLIP = self.YUV420P8_CLIP.resize.Point(format=self.YUV420P8_CLIP.format.replace(bits_per_sample=32, sample_type=vs.FLOAT))
 
-        self.assertEqual(vsutil.get_peak_value(self.YUV420P8_CLIP, False), 255)
-        self.assertEqual(vsutil.get_peak_value(self.YUV420P8_CLIP, True), 255)
+        self.assertEqual(vsutil.get_peak_value(self.YUV420P8_CLIP, False), 255.)
+        self.assertEqual(vsutil.get_peak_value(self.YUV420P8_CLIP, True), 255.)
 
         self.assertEqual(vsutil.get_peak_value(FLOAT_CLIP, False), 1.0)
         self.assertEqual(vsutil.get_peak_value(FLOAT_CLIP, True), 0.5)
