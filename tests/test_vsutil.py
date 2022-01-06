@@ -273,6 +273,27 @@ class VsUtilTests(unittest.TestCase):
         self.assertEqual(vsutil.scale_value(0.5, 32, 8, range_in=1, range=0, scale_offsets=True, chroma=True), 240)
         self.assertEqual(vsutil.scale_value((255 - 128) / 255, 32, 8, range_in=1, range=1, scale_offsets=True, chroma=True), 255)
 
+    def test_get_values(self):
+        FLOAT_CLIP = self.YUV420P8_CLIP.resize.Point(format=self.YUV420P8_CLIP.format.replace(bits_per_sample=32, sample_type=vs.FLOAT))
+
+        self.assertEqual(vsutil.get_lowest_value(self.YUV420P8_CLIP, False), 0)
+        self.assertEqual(vsutil.get_lowest_value(self.YUV420P8_CLIP, True), 0)
+
+        self.assertEqual(vsutil.get_lowest_value(FLOAT_CLIP, False), 0)
+        self.assertEqual(vsutil.get_lowest_value(FLOAT_CLIP, True), -0.5)
+
+        self.assertEqual(vsutil.get_neutral_value(self.YUV420P8_CLIP, False), 128)
+        self.assertEqual(vsutil.get_neutral_value(self.YUV420P8_CLIP, True), 128)
+
+        self.assertEqual(vsutil.get_neutral_value(FLOAT_CLIP, False), 0.5)
+        self.assertEqual(vsutil.get_neutral_value(FLOAT_CLIP, True), 0)
+
+        self.assertEqual(vsutil.get_peak_value(self.YUV420P8_CLIP, False), 255)
+        self.assertEqual(vsutil.get_peak_value(self.YUV420P8_CLIP, True), 255)
+
+        self.assertEqual(vsutil.get_peak_value(FLOAT_CLIP, False), 1.0)
+        self.assertEqual(vsutil.get_peak_value(FLOAT_CLIP, True), 0.5)
+
     def test_depth(self):
         with self.assertRaisesRegex(ValueError, 'sample_type must be in'):
             vsutil.depth(self.RGB24_CLIP, 8, sample_type=2)
