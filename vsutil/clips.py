@@ -139,15 +139,17 @@ def insert_clip(clip: vs.VideoNode, /, insert: vs.VideoNode, start_frame: int) -
 
 
 def join(planes: Sequence[vs.VideoNode], family: vs.ColorFamily = vs.YUV) -> vs.VideoNode:
-    """Joins the supplied list of planes into a three-plane VideoNode (defaults to YUV).
+    """Joins the supplied sequence of planes into a single VideoNode (defaults to YUV).
 
     >>> planes = [Y, U, V]
-    >>> clip = join(planes)
+    >>> clip_YUV = join(planes)
+    >>> plane = core.std.BlankClip(format=vs.GRAY8)
+    >>> clip_GRAY = join([plane], family=vs.GRAY)
 
-    :param planes:  Sequence of 3 one-plane ``vapoursynth.GRAY`` clips to merge.
-    :param family:  Output color family. Must be a three-plane color family.
+    :param planes:  Sequence of one-plane ``vapoursynth.GRAY`` clips to merge.
+    :param family:  Output color family.
 
-    :return:        Three-plane clip of the supplied `planes`.
+    :return:        Merged clip of the supplied `planes`.
     """
     return planes[0] if len(planes) == 1 and family == vs.GRAY \
         else core.std.ShufflePlanes(planes, [0, 0, 0], family)
@@ -178,6 +180,9 @@ def split(clip: vs.VideoNode, /) -> List[vs.VideoNode]:
 
     >>> src = vs.core.std.BlankClip(format=vs.RGB27)
     >>> R, G, B = split(src)
+    >>> src2 = vs.core.std.BlankClip(format=vs.GRAY8)
+    >>> split(src2)
+    [<vapoursynth.VideoNode object>]  # always returns a list, even if single plane
 
     :param clip:  Input clip.
 
