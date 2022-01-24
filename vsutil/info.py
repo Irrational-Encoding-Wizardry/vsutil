@@ -1,7 +1,7 @@
 """
 Functions that give information about clips or mathematical helpers.
 """
-__all__ = ['get_depth', 'get_plane_size', 'get_subsampling', 'get_w', 'is_image', 'scale_value']
+__all__ = ['get_depth', 'get_plane_size', 'get_subsampling', 'get_w', 'is_image', 'scale_value', 'get_lowest_value', 'get_neutral_value', 'get_peak_value']
 
 from mimetypes import types_map
 from os import path
@@ -197,3 +197,48 @@ def scale_value(value: Union[int, float],
             value += 16 << (output_depth - 8)
 
     return value
+
+
+@func.disallow_variable_format
+def get_lowest_value(clip: vs.VideoNode, chroma: bool = False) -> float:
+    """Returns the lowest possible value for the combination
+    of the plane type and bit depth/type of the clip as float.
+
+    :param clip:     Input clip.
+    :param chroma:   Whether to get luma or chroma plane value
+
+    :return:      Lowest possible value.
+    """
+    is_float = clip.format.sample_type == vs.FLOAT
+
+    return -0.5 if chroma and is_float else 0.
+
+
+@func.disallow_variable_format
+def get_neutral_value(clip: vs.VideoNode, chroma: bool = False) -> float:
+    """Returns the neutral value for the combination
+    of the plane type and bit depth/type of the clip as float.
+
+    :param clip:     Input clip.
+    :param chroma:   Whether to get luma or chroma plane value
+
+    :return:      Neutral value.
+    """
+    is_float = clip.format.sample_type == vs.FLOAT
+
+    return (0. if chroma else 0.5) if is_float else float(1 << (get_depth(clip) - 1))
+
+
+@func.disallow_variable_format
+def get_peak_value(clip: vs.VideoNode, chroma: bool = False) -> float:
+    """Returns the highest possible value for the combination
+    of the plane type and bit depth/type of the clip as float.
+
+    :param clip:     Input clip.
+    :param chroma:   Whether to get luma or chroma plane value
+
+    :return:      Highest possible value.
+    """
+    is_float = clip.format.sample_type == vs.FLOAT
+
+    return (0.5 if chroma else 1.) if is_float else (1 << get_depth(clip)) - 1.

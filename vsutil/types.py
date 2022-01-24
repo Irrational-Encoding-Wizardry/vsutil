@@ -47,7 +47,7 @@ by assignment. So the first clip will have the name EXPR_VAR_NAMES[0], the secon
 have the name EXPR_VAR_NAMES[1], and so on.
 
 This can be used to automatically generate Expr-strings.
-"""    
+"""
 
 
 def _readable_enums(enum: Type[Enum]) -> str:
