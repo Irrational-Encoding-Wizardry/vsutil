@@ -170,6 +170,10 @@ def plane(clip: vs.VideoNode, planeno: int, /) -> vs.VideoNode:
     """
     if clip.format.num_planes == 1 and planeno == 0:
         return clip
+
+    if clip.format.color_family == vs.RGB:
+        clip = clip.std.RemoveFrameProps('_Matrix')
+
     return core.std.ShufflePlanes(clip, planeno, vs.GRAY)
 
 
