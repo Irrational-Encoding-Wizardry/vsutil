@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Decorators and non-VapourSynth-related functions.
 """
@@ -8,8 +9,9 @@ __all__ = [
     'fallback', 'iterate',
 ]
 
-import functools
-from typing import Any, Callable, cast, Optional, TypeVar, Union
+import inspect
+from functools import partial, wraps
+from typing import Union, Any, TypeVar, Callable, cast, overload, Optional
 
 import vapoursynth as vs
 
@@ -18,34 +20,86 @@ T = TypeVar('T')
 R = TypeVar('R')
 
 
-def disallow_variable_format(function: F) -> F:
-    """Function decorator that raises an exception if the input clip has a variable format.
+def _check_variable(
+    function: F, vname: str, only_first: bool, check_func: Callable[[vs.VideoNode], bool]
+) -> Any:
+    def _check(x: Any) -> bool:
+        return isinstance(x, vs.VideoNode) and check_func(x)
 
-    Decorated `function`'s first parameter must be of type ``vapoursynth.VideoNode`` and is the only parameter checked.
+    @wraps(function)
+    def _wrapper(*args: Any, **kwargs: Any) -> Any:
+        for obj in args[:1] if only_first else [*args, *kwargs.values()]:
+            if _check(obj):
+                raise ValueError(
+                    f"{function.__name__}: 'Variable-{vname} clips not supported.'"
+                )
+
+        if not only_first:
+            for name, param in inspect.signature(function).parameters.items():
+                if param.default is not inspect.Parameter.empty and _check(param.default):
+                    raise ValueError(
+                        f"{function.__name__}: 'Variable-{vname} clip not allowed in default argument `{name}`.'"
+                    )
+
+        return function(*args, **kwargs)
+
+    return cast(F, _wrapper)
+
+
+@overload
+def disallow_variable_format(*, only_first: bool = False) -> Callable[[F], F]:
+    ...
+
+
+@overload
+def disallow_variable_format(function: F | None = None, /) -> F:
+    ...
+
+
+def disallow_variable_format(function: F | None = None, /, *, only_first: bool = False) -> Callable[[F], F] | F:
+    """Function decorator that raises an exception if input clips have variable format.
+        :param function:    Function to wrap.
+        :param only_first:  Whether to check only the first argument or not.
+
+        :return:            Wrapped function.
     """
 
-    @functools.wraps(function)
-    def _check(clip: vs.VideoNode, *args, **kwargs) -> Any:
-        if clip.format is None:
-            raise ValueError('Variable-format clips not supported.')
-        return function(clip, *args, **kwargs)
+    if function is None:
+        return cast(Callable[[F], F], partial(disallow_variable_format, only_first=only_first))
 
-    return cast(F, _check)
+    assert function
+
+    return _check_variable(
+        function, 'format', only_first, lambda x: x.format is None
+    )
 
 
-def disallow_variable_resolution(function: F) -> F:
-    """Function decorator that raises an exception if the input clip has a variable resolution.
+@overload
+def disallow_variable_resolution(*, only_first: bool = False) -> Callable[[F], F]:
+    ...
 
-    Decorated `function`'s first parameter must be of type ``vapoursynth.VideoNode`` and is the only parameter checked.
+
+@overload
+def disallow_variable_resolution(function: F | None = None, /) -> F:
+    ...
+
+
+def disallow_variable_resolution(function: F | None = None, /, *, only_first: bool = False) -> Callable[[F], F] | F:
+    """Function decorator that raises an exception if input clips have variable resolution.
+        :param function:    Function to wrap.
+        :param only_first:  Whether to check only the first argument or not.
+
+        :return:            Wrapped function.
     """
 
-    @functools.wraps(function)
-    def _check(clip: vs.VideoNode, *args, **kwargs) -> Any:
-        if 0 in (clip.width, clip.height):
-            raise ValueError('Variable-resolution clips not supported.')
-        return function(clip, *args, **kwargs)
+    if function is None:
+        return cast(Callable[[F], F], partial(disallow_variable_resolution, only_first=only_first))
 
-    return cast(F, _check)
+    assert function
+
+    return _check_variable(
+        function, 'format', only_first, lambda x: not all({x.width, x.height})
+    )
 
 
 def fallback(value: Optional[T], fallback_value: T) -> T:
