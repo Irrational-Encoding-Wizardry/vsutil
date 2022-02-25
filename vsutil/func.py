@@ -64,7 +64,7 @@ def fallback(value: Optional[T], fallback_value: T) -> T:
     return fallback_value if value is None else value
 
 
-def iterate(base: T, function: Callable[[Union[T, R]], R], count: int) -> Union[T, R]:
+def iterate(base: T, function: Callable[[Union[T, R]], R], count: int, **kwargs: Any) -> Union[T, R]:
     """Utility function that executes a given function a given number of times.
 
     >>> def double(x):
@@ -76,13 +76,16 @@ def iterate(base: T, function: Callable[[Union[T, R]], R], count: int) -> Union[
     :param base:      Initial value.
     :param function:  Function to execute.
     :param count:     Number of times to execute `function`.
+    :param kwargs:    Kwargs passed to `function`.
 
     :return:          `function`'s output after repeating `count` number of times.
     """
     if count < 0:
         raise ValueError('Count cannot be negative.')
 
-    v: Union[T, R] = base
-    for _ in range(count):
-        v = function(v)
-    return v
+    def _iterate(f, x, n):
+        return x if n <= 0 else _iterate(f, f(x), n - 1)
+
+    func = functools.partial(function, **kwargs)
+
+    return _iterate(func, base, count)
