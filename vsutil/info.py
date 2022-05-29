@@ -205,7 +205,7 @@ def get_lowest_value(clip: vs.VideoNode, chroma: bool = False) -> float:
     of the plane type and bit depth/type of the clip as float.
 
     :param clip:     Input clip.
-    :param chroma:   Whether to get luma or chroma plane value
+    :param chroma:   Whether to get luma (default) or chroma plane value.
 
     :return:      Lowest possible value.
     """
@@ -220,7 +220,7 @@ def get_neutral_value(clip: vs.VideoNode, chroma: bool = False) -> float:
     of the plane type and bit depth/type of the clip as float.
 
     :param clip:     Input clip.
-    :param chroma:   Whether to get luma or chroma plane value
+    :param chroma:   Whether to get luma (default) or chroma plane value.
 
     :return:      Neutral value.
     """
@@ -235,7 +235,7 @@ def get_peak_value(clip: vs.VideoNode, chroma: bool = False) -> float:
     of the plane type and bit depth/type of the clip as float.
 
     :param clip:     Input clip.
-    :param chroma:   Whether to get luma or chroma plane value
+    :param chroma:   Whether to get luma (default) or chroma plane value.
 
     :return:      Highest possible value.
     """
