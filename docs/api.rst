@@ -37,6 +37,9 @@ Clip information and helper functions
 **Helpers to inspect a clip/frame**
 
 .. autofunction:: vsutil.get_depth
+.. autofunction:: vsutil.get_lowest_value
+.. autofunction:: vsutil.get_neutral_value
+.. autofunction:: vsutil.get_peak_value
 .. autofunction:: vsutil.get_plane_size
 .. autofunction:: vsutil.get_subsampling
 .. autofunction:: vsutil.is_image
