@@ -56,3 +56,16 @@ Enums
     :members:
 .. autoclass:: vsutil.Range
     :members:
+
+Other
+=====
+.. py:data:: vsutil.EXPR_VARS
+    :type: str
+    :value: 'xyzabcdefghijklmnopqrstuvw'
+
+    This constant contains a list of all variables that can appear inside an expr-string ordered
+    by assignment. So the first clip will have the name *EXPR_VARS[0]*, the second one will
+    have the name *EXPR_VARS[1]*, and so on.
+
+    This can be used to automatically generate expr-strings.
+
