@@ -22,6 +22,7 @@ Miscellanious non-VapourSynth functions
 
 .. autofunction:: vsutil.fallback
 .. autofunction:: vsutil.iterate
+.. autofunction:: vsutil.resolve_enum
 
 
 Decorators
