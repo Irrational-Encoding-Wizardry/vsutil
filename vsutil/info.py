@@ -155,8 +155,8 @@ def scale_value(value: Union[int, float],
 
     :return:              Scaled numeric value.
     """
-    range_in = types._resolve_enum(types.Range, range_in, 'range_in', scale_value)
-    range = types._resolve_enum(types.Range, range, 'range', scale_value)
+    range_in = types.resolve_enum(types.Range, range_in, 'range_in', scale_value)
+    range = types.resolve_enum(types.Range, range, 'range', scale_value)
     range = func.fallback(range, range_in)
 
     if input_depth == 32:

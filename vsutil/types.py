@@ -1,7 +1,7 @@
 """
 Enums and related functions.
 """
-__all__ = ['Dither', 'Range', 'EXPR_VARS']
+__all__ = ['Dither', 'Range', 'EXPR_VARS', 'resolve_enum']
 
 # this file only depends on the stdlib and should stay that way
 from enum import Enum
@@ -61,11 +61,25 @@ def _readable_enums(enum: Type[Enum]) -> str:
         return ', '.join([repr(i) for i in enum])
 
 
-def _resolve_enum(enum: Type[E], value: Any, var_name: str, fn: Optional[Callable] = None) -> Union[E, None]:
+def resolve_enum(enum: Type[E], value: Any, var_name: str, fn: Optional[Callable] = None) -> Union[E, None]:
     """
-    Attempts to evaluate `value` in `enum` if value is not None, otherwise returns None.
-    Basically checks if a supplied enum value is valid and returns a readable error message
-    explaining the possible enum values if it isn't.
+    Attempts to evaluate `value` in `enum` if value is not ``None``, otherwise returns ``None``.
+
+    >>> def my_fn(family: Optional[int]):
+    ...     return resolve_enum(vs.ColorFamily, family, 'family', my_fn)
+    >>> my_fn(None)
+    None
+    >>> my_fn(3)
+    <ColorFamily.YUV: 3>
+    >>> my_fn(9)
+    ValueError: my_fn: family must be in <vapoursynth.UNDEFINED: 0>, <vapoursynth.GRAY: 1>, ...
+
+    :param enum:      Enumeration, i.e. ``vapoursynth.ColorFamily``.
+    :param value:     Value to check. Can be ``None``.
+    :param var_name:  User-provided parameter name that needs to be checked.
+    :param fn:        Function that should be causing the exception (used for error message only).
+
+    :return:          The enum member or ``None``.
     """
     if value is None:
         return None
