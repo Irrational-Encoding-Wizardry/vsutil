@@ -5,6 +5,20 @@ Version History
 .. automodule:: vsutil
    :noindex:
 
+0.7.0
+-----
+
+..
+
+- New functions:
+
+  * :func:`resolve_enum` added to public API (previously a private function used internally).
+  * :func:`get_lowest_value`, :func:`get_neutral_value`, and :func:`get_peak_value` for relevant min/median/max float values based on sample-type and bit depth.
+
+- Changes to existing functions:
+
+  * Deprecated ``enforce_cache`` parameter of :func:`frame2clip`.
+
 0.6.0
 -----
 
