@@ -3,7 +3,7 @@ Functions that modify/return a clip.
 """
 __all__ = ['depth', 'frame2clip', 'get_y', 'insert_clip', 'join', 'plane', 'split']
 
-from typing import List, Optional, Union, Any
+from typing import Any, List, Optional, Sequence, Union, cast
 
 import vapoursynth as vs
 
@@ -138,20 +138,21 @@ def insert_clip(clip: vs.VideoNode, /, insert: vs.VideoNode, start_frame: int) -
     return pre + insert + post
 
 
-def join(planes: List[vs.VideoNode], family: vs.ColorFamily = vs.YUV) -> vs.VideoNode:
-    """Joins the supplied list of planes into a three-plane VideoNode (defaults to YUV).
+def join(planes: Sequence[vs.VideoNode], family: vs.ColorFamily = vs.YUV) -> vs.VideoNode:
+    """Joins the supplied sequence of planes into a single VideoNode (defaults to YUV).
 
     >>> planes = [Y, U, V]
-    >>> clip = join(planes)
+    >>> clip_YUV = join(planes)
+    >>> plane = core.std.BlankClip(format=vs.GRAY8)
+    >>> clip_GRAY = join([plane], family=vs.GRAY)
 
-    :param planes:  List of 3 one-plane ``vapoursynth.GRAY`` clips to merge.
-    :param family:  Output color family. Must be a three-plane color family.
+    :param planes:  Sequence of one-plane ``vapoursynth.GRAY`` clips to merge.
+    :param family:  Output color family.
 
-    :return:        Three-plane clip of the supplied `planes`.
+    :return:        Merged clip of the supplied `planes`.
     """
-    if family not in [vs.RGB, vs.YUV]:
-        raise ValueError('Color family must have 3 planes.')
-    return core.std.ShufflePlanes(clips=planes, planes=[0, 0, 0], colorfamily=family)
+    return planes[0] if len(planes) == 1 and family == vs.GRAY \
+        else core.std.ShufflePlanes(planes, [0, 0, 0], family)
 
 
 @func.disallow_variable_format
@@ -178,13 +179,16 @@ def split(clip: vs.VideoNode, /) -> List[vs.VideoNode]:
     """Returns a list of planes (VideoNodes) from the given input clip.
 
     >>> src = vs.core.std.BlankClip(format=vs.RGB27)
-    >>> R, G, B  = split(src)
+    >>> R, G, B = split(src)
+    >>> src2 = vs.core.std.BlankClip(format=vs.GRAY8)
+    >>> split(src2)
+    [<vapoursynth.VideoNode object>]  # always returns a list, even if single plane
 
     :param clip:  Input clip.
 
     :return:      List of planes from the input `clip`.
     """
-    return [plane(clip, x) for x in range(clip.format.num_planes)]
+    return [clip] if clip.format.num_planes == 1 else cast(List[vs.VideoNode], clip.std.SplitPlanes())
 
 
 def _should_dither(in_bits: int,
