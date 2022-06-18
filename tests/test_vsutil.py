@@ -137,6 +137,11 @@ class VsUtilTests(unittest.TestCase):
         # This should be a no-op, and even the clip reference shouldn’t change
         self.assertEqual(y, vsutil.plane(y, 0))
 
+    def test_plane_rgb(self):
+        clip = self.YUV444P8_CLIP.resize.Bicubic(format=vs.RGBS, matrix_in=1)
+
+        vsutil.plane(clip, 0)
+
     def test_split_join(self):
         planes = vsutil.split(self.BLACK_SAMPLE_CLIP)
         self.assertEqual(len(planes), 3)
