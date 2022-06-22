@@ -13,3 +13,8 @@
 .rst-content .viewcode-back,.rst-content .viewcode-link,.rst-content a code.xref {
     color: #007020
 }
+
+span.sig-prename.descclassname, span.sig-name.descname {
+    color: black;
+    font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",Courier,monospace;
+}
