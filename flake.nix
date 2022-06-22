@@ -45,7 +45,12 @@
 
       packages.default = python.pkgs.buildPythonPackage {
         pname = "vsutil";
-        version = "0.7.0";
+        version = 
+          let 
+            content = builtins.readFile ./vsutil/_metadata.py;
+            version = builtins.match ".*__version__.*'(.*)'.*" content;
+          in
+          builtins.elemAt version 0;
         src = ./.;
         buildInputs = [
           vapoursynth_python 
