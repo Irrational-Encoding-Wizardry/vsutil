@@ -59,6 +59,25 @@
           ${python}/bin/python -m unittest discover -s $src/tests
         '';
       };
+
+      packages.dist = 
+        let
+          build_python = python.withPackages (ps: [
+            ps.setuptools
+            ps.wheel
+          ]);
+        in
+        pkgs.runCommandNoCC "vsutil-dist" { src = ./.; } ''
+          # Make sure the package test run.
+          echo ${self.packages.${system}.default} >/dev/null
+
+          cp -r $src/* .
+          ${build_python}/bin/python setup.py bdist_wheel
+          ${build_python}/bin/python setup.py sdist
+
+          mkdir $out
+          cp ./dist/* $out
+        '';
       defaultPackage = self.packages.${system}.default;
     }
   );
