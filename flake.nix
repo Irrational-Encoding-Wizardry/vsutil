@@ -14,24 +14,19 @@
       ## run "nix flake lock --update-input nixpkgs" after you did that.
       python = pkgs.python310;
 
-      # Fix brokenness of nix-VapourSynth on darwin
-      vapoursynth = pkgs.vapoursynth.overrideAttrs (old: {
-        patches = [];
-        meta.broken = false;
-        meta.platforms = [ system ];
-      });
-
-      # The python package for the python version of choice.
-      vapoursynth_python = python.pkgs.buildPythonPackage {
-        pname = "vapoursynth";
-        inherit (pkgs.vapoursynth) version src;
-        nativeBuildInputs = [ 
-          python.pkgs.cython 
-        ];
-        buildInputs = [
-          vapoursynth
-        ];
-      };
+      # On darwin it sadly needs to be monkey-patched still.
+      vapoursynth_python =
+        if nixpkgs.lib.hasSuffix "-darwin" system then
+          python.pkgs.vapoursynth.override {
+            vapoursynth = 
+              pkgs.vapoursynth.overrideAttrs (old: {
+                patches = [];
+                meta.broken = false;
+                meta.platforms = [ system ];
+              });
+          }
+        else
+          python.pkgs.vapoursynth;
     in
     {
       devShells.default = pkgs.mkShell {
