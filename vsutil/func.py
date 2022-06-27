@@ -58,6 +58,7 @@ def disallow_variable_format(function: F | None = None, /) -> F:
 
 def disallow_variable_format(function: F | None = None, /, *, only_first: bool = False) -> Callable[[F], F] | F:
     """Function decorator that raises an exception if input clips have variable format.
+
         :param function:    Function to wrap.
         :param only_first:  Whether to check only the first argument or not.
 
@@ -86,6 +87,7 @@ def disallow_variable_resolution(function: F | None = None, /) -> F:
 
 def disallow_variable_resolution(function: F | None = None, /, *, only_first: bool = False) -> Callable[[F], F] | F:
     """Function decorator that raises an exception if input clips have variable resolution.
+
         :param function:    Function to wrap.
         :param only_first:  Whether to check only the first argument or not.
 
