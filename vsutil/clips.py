@@ -1,7 +1,15 @@
 """
 Functions that modify/return a clip.
 """
-__all__ = ['depth', 'frame2clip', 'get_y', 'insert_clip', 'join', 'plane', 'split']
+__all__ = [
+    'depth',
+    # frame util
+    'frame2clip',
+    # plane utils
+    'get_y', 'join', 'plane', 'split',
+    # clip splicing utils
+    'insert_clip', 'shift_clip', 'shift_clip_multi'
+]
 
 from typing import Any, List, Optional, Sequence, Union, cast
 
@@ -229,3 +237,21 @@ def _should_dither(in_bits: int,
                 or float_to_int
                 or (in_range == types.Range.FULL and upsampling and (in_bits, out_bits) != (8, 16))
                 or downsampling)
+
+
+def shift_clip(clip: vs.VideoNode, offset: int) -> vs.VideoNode:
+    if offset > clip.num_frames - 1:
+        raise ValueError("shift_clip: Offset can't be greater than the clip length!")
+
+    if offset < 0:
+        return clip[0] * abs(offset) + clip[:offset]
+    elif offset > 0:
+        return clip[offset:] + clip[-1] * offset
+
+    return clip
+
+
+def shift_clip_multi(clip, shift: types.FrameRange = (-1, 1)):
+    ranges = func.normalize_franges(shift)
+
+    return [shift_clip(clip, x) for x in ranges]
