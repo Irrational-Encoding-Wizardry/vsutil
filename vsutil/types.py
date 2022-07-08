@@ -1,13 +1,14 @@
 """
 Enums and related functions.
 """
-__all__ = ['Dither', 'Range', 'EXPR_VARS', 'resolve_enum']
+__all__ = ['Dither', 'Range', 'FrameRange', 'EXPR_VARS', 'resolve_enum']
 
 # this file only depends on the stdlib and should stay that way
 from enum import Enum
-from typing import Any, Callable, Optional, Type, TypeVar, Union
+from typing import Any, Callable, List, Optional, Tuple, Type, TypeVar, Union
 
 E = TypeVar('E', bound=Enum)
+FrameRange = Union[int, Tuple[int, int], List[int]]
 
 
 class _NoSubmoduleRepr:

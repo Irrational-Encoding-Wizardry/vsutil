@@ -1,19 +1,24 @@
 from __future__ import annotations
+
 """
 Decorators and non-VapourSynth-related functions.
 """
 __all__ = [
     # decorators
     'disallow_variable_format', 'disallow_variable_resolution',
+    # function utils
+    'normalize_franges',
     # misc non-vapoursynth related
     'fallback', 'iterate',
 ]
 
 import inspect
 from functools import partial, wraps
-from typing import Union, Any, TypeVar, Callable, cast, overload, Optional
+from typing import Any, Callable, Iterable, Optional, TypeVar, Union, cast, overload
 
 import vapoursynth as vs
+
+from .types import FrameRange
 
 F = TypeVar('F', bound=Callable)
 T = TypeVar('T')
@@ -142,3 +147,14 @@ def iterate(base: T, function: Callable[[Union[T, R]], R], count: int) -> Union[
     for _ in range(count):
         v = function(v)
     return v
+
+
+def normalize_franges(franges: FrameRange, /) -> Iterable[int]:
+    if isinstance(franges, int):
+        return [franges]
+    elif isinstance(franges, tuple):
+        start, stop = franges
+        step = -1 if stop < start else 1
+        return range(start, stop + step, step)
+    else:
+        return franges
