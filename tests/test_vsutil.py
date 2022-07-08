@@ -147,6 +147,17 @@ class VsUtilTests(unittest.TestCase):
         clip = vsutil.frame2clip(frame)
         self.assert_same_frame(self.WHITE_SAMPLE_CLIP, clip)
 
+    def test_shift_clip(self):
+        shifted = vsutil.shift_clip(self.WHITE_SAMPLE_CLIP, 1)
+
+        self.assert_same_metadata(shifted, self.WHITE_SAMPLE_CLIP)
+
+    def test_shift_clip_multi(self):
+        shifted_clips = vsutil.shift_clip_multi(self.WHITE_SAMPLE_CLIP, (-2, 2))
+
+        self.assertEqual(len(shifted_clips), 5)
+        self.assert_same_metadata(shifted_clips[0], self.WHITE_SAMPLE_CLIP)
+
     def test_is_image(self):
         """These are basically tests for the mime types, but I want the coverage. rooDerp"""
         self.assertEqual(vsutil.is_image('something.png'), True)
