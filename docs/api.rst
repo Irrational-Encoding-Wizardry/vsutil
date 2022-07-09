@@ -14,9 +14,9 @@ Functions that return a clip
 .. autofunction:: vsutil.insert_clip
 .. autofunction:: vsutil.join
 .. autofunction:: vsutil.plane
-.. autofunction:: vsutil.split
 .. autofunction:: vsutil.shift_clip
 .. autofunction:: vsutil.shift_clip_multi
+.. autofunction:: vsutil.split
 
 
 Miscellanious non-VapourSynth functions
