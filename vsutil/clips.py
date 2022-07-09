@@ -251,7 +251,7 @@ def shift_clip(clip: vs.VideoNode, offset: int) -> vs.VideoNode:
     return clip
 
 
-def shift_clip_multi(clip, shift: types.FrameRange = (-1, 1)):
+def shift_clip_multi(clip, shift: types.FrameRange = (-1, 1)) -> List[vs.VideoNode]:
     ranges = func.normalize_franges(shift)
 
     return [shift_clip(clip, x) for x in ranges]
