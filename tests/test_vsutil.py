@@ -6,23 +6,24 @@ import vsutil
 
 
 class VsUtilTests(unittest.TestCase):
-    YUV420P8_CLIP = vs.core.std.BlankClip(format=vs.YUV420P8, width=160, height=120, color=[0, 128, 128], length=100)
-    YUV420P10_CLIP = vs.core.std.BlankClip(format=vs.YUV420P10, width=160, height=120, color=[0, 128, 128], length=100)
-    YUV444P8_CLIP = vs.core.std.BlankClip(format=vs.YUV444P8, width=160, height=120, color=[0, 128, 128], length=100)
-    YUV422P8_CLIP = vs.core.std.BlankClip(format=vs.YUV422P8, width=160, height=120, color=[0, 128, 128], length=100)
-    YUV410P8_CLIP = vs.core.std.BlankClip(format=vs.YUV410P8, width=160, height=120, color=[0, 128, 128], length=100)
-    YUV411P8_CLIP = vs.core.std.BlankClip(format=vs.YUV411P8, width=160, height=120, color=[0, 128, 128], length=100)
-    YUV440P8_CLIP = vs.core.std.BlankClip(format=vs.YUV440P8, width=160, height=120, color=[0, 128, 128], length=100)
-    RGB24_CLIP = vs.core.std.BlankClip(format=vs.RGB24)
+    def setUp(self):
+        self.YUV420P8_CLIP = vs.core.std.BlankClip(format=vs.YUV420P8, width=160, height=120, color=[0, 128, 128], length=100)
+        self.YUV420P10_CLIP = vs.core.std.BlankClip(format=vs.YUV420P10, width=160, height=120, color=[0, 128, 128], length=100)
+        self.YUV444P8_CLIP = vs.core.std.BlankClip(format=vs.YUV444P8, width=160, height=120, color=[0, 128, 128], length=100)
+        self.YUV422P8_CLIP = vs.core.std.BlankClip(format=vs.YUV422P8, width=160, height=120, color=[0, 128, 128], length=100)
+        self.YUV410P8_CLIP = vs.core.std.BlankClip(format=vs.YUV410P8, width=160, height=120, color=[0, 128, 128], length=100)
+        self.YUV411P8_CLIP = vs.core.std.BlankClip(format=vs.YUV411P8, width=160, height=120, color=[0, 128, 128], length=100)
+        self.YUV440P8_CLIP = vs.core.std.BlankClip(format=vs.YUV440P8, width=160, height=120, color=[0, 128, 128], length=100)
+        self.RGB24_CLIP = vs.core.std.BlankClip(format=vs.RGB24)
 
-    SMALLER_SAMPLE_CLIP = vs.core.std.BlankClip(format=vs.YUV420P8, width=10, height=10)
+        self.SMALLER_SAMPLE_CLIP = vs.core.std.BlankClip(format=vs.YUV420P8, width=10, height=10)
 
-    BLACK_SAMPLE_CLIP = vs.core.std.BlankClip(format=vs.YUV420P8, width=160, height=120, color=[0, 128, 128],
-                                              length=100)
-    WHITE_SAMPLE_CLIP = vs.core.std.BlankClip(format=vs.YUV420P8, width=160, height=120, color=[255, 128, 128],
-                                              length=100)
+        self.BLACK_SAMPLE_CLIP = vs.core.std.BlankClip(format=vs.YUV420P8, width=160, height=120, color=[0, 128, 128],
+                                                       length=100)
+        self.WHITE_SAMPLE_CLIP = vs.core.std.BlankClip(format=vs.YUV420P8, width=160, height=120, color=[255, 128, 128],
+                                                       length=100)
 
-    VARIABLE_FORMAT_CLIP = vs.core.std.Interleave([YUV420P8_CLIP, YUV444P8_CLIP], mismatch=True)
+        self.VARIABLE_FORMAT_CLIP = vs.core.std.Interleave([self.YUV420P8_CLIP, self.YUV444P8_CLIP], mismatch=True)
 
     def assert_same_dimensions(self, clip_a: vs.VideoNode, clip_b: vs.VideoNode):
         """
