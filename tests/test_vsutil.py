@@ -5,7 +5,11 @@ import vapoursynth as vs
 import vsutil
 
 
+MODULE_FUNCTION = vsutil.function("std", "BlankClip")
+
 class VsUtilTests(unittest.TestCase):
+    CLASS_FUNCTION = vsutil.function("std", "BlankClip")
+
     def setUp(self):
         self.YUV420P8_CLIP = vs.core.std.BlankClip(format=vs.YUV420P8, width=160, height=120, color=[0, 128, 128], length=100)
         self.YUV420P10_CLIP = vs.core.std.BlankClip(format=vs.YUV420P10, width=160, height=120, color=[0, 128, 128], length=100)
@@ -377,3 +381,26 @@ class VsUtilTests(unittest.TestCase):
     def test_decorators(self):
         with self.assertRaisesRegex(ValueError, 'Variable-format'):
             vsutil.get_subsampling(self.VARIABLE_FORMAT_CLIP)
+
+    def test_function(self):
+        # It should work generally.
+        self.assert_same_metadata(vsutil.function("std", "BlankClip")(), vs.core.std.BlankClip())
+        self.assert_same_frame(vsutil.function("std", "BlankClip")(), vs.core.std.BlankClip())
+
+        # It should behave like @staticmethod
+        self.assert_same_metadata(self.CLASS_FUNCTION(), vs.core.std.BlankClip())
+        self.assert_same_frame(self.CLASS_FUNCTION(), vs.core.std.BlankClip())
+
+        # This is probably pointless,
+        # as the test is actually far earlier:
+        # It should not prevent loading the module
+        # when using vs-engine's vpy-unittest tool.
+        self.assert_same_metadata(MODULE_FUNCTION(), vs.core.std.BlankClip())
+        self.assert_same_frame(MODULE_FUNCTION(), vs.core.std.BlankClip())
+
+        # It should have the same attributes.
+        alias_func = vsutil.function("std", "BlankClip")
+        orig_func = vs.core.std.BlankClip
+        self.assertEqual(alias_func.name, orig_func.name)
+        self.assertEqual(alias_func.signature, orig_func.signature)
+        self.assertEqual(alias_func.return_signature, orig_func.return_signature)
