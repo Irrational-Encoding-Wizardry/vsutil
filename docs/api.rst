@@ -73,3 +73,4 @@ Other
 
     This can be used to automatically generate expr-strings.
 
+.. autoclass:: vsutil.function
