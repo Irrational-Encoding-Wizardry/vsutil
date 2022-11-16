@@ -3,6 +3,7 @@ Functions that modify/return a clip.
 """
 __all__ = ['depth', 'frame2clip', 'get_y', 'insert_clip', 'join', 'plane', 'split']
 
+import warnings
 from typing import Any, List, Optional, Sequence, Union, cast
 
 import vapoursynth as vs
@@ -51,6 +52,8 @@ def depth(clip: vs.VideoNode,
 
     :return:             Converted clip with desired bit depth and sample type. ``ColorFamily`` will be same as input.
     """
+    warnings.warn('vsutil.depth: deprecated in favor of vstools.depth!', DeprecationWarning)
+
     sample_type = types.resolve_enum(vs.SampleType, sample_type, 'sample_type', depth)
     range = types.resolve_enum(types.Range, range, 'range', depth)
     range_in = types.resolve_enum(types.Range, range_in, 'range_in', depth)
@@ -81,6 +84,8 @@ def frame2clip(frame: vs.VideoFrame, /, *, enforce_cache=_unused) -> vs.VideoNod
 
     :return: A one-frame clip that yields the `frame` passed to the function.
     """
+    warnings.warn('vsutil.frame2clip: deprecated in favor of vstools.frame2clip!', DeprecationWarning)
+
     if enforce_cache is not _unused:
         import warnings
         warnings.warn("enforce_cache is deprecated.", DeprecationWarning)
@@ -109,6 +114,8 @@ def get_y(clip: vs.VideoNode, /) -> vs.VideoNode:
 
     :return:     Luma plane of the input `clip`. Will return the input `clip` if it is a single-plane grayscale clip.
     """
+    warnings.warn('vsutil.get_y: deprecated in favor of vstools.get_y!', DeprecationWarning)
+
     if clip.format.color_family not in (vs.YUV, vs.GRAY):
         raise ValueError('The clip must have a luma plane.')
     return plane(clip, 0)
@@ -126,6 +133,8 @@ def insert_clip(clip: vs.VideoNode, /, insert: vs.VideoNode, start_frame: int) -
 
     :return:             Longer clip with frames replaced by the shorter clip.
     """
+    warnings.warn('vsutil.insert_clip: deprecated in favor of vstools.insert_clip!', DeprecationWarning)
+
     if start_frame == 0:
         return insert + clip[insert.num_frames:]
     pre = clip[:start_frame]
@@ -151,6 +160,8 @@ def join(planes: Sequence[vs.VideoNode], family: vs.ColorFamily = vs.YUV) -> vs.
 
     :return:        Merged clip of the supplied `planes`.
     """
+    warnings.warn('vsutil.join: deprecated in favor of vstools.join!', DeprecationWarning)
+
     return planes[0] if len(planes) == 1 and family == vs.GRAY \
         else core.std.ShufflePlanes(planes, [0, 0, 0], family)
 
@@ -169,6 +180,8 @@ def plane(clip: vs.VideoNode, planeno: int, /) -> vs.VideoNode:
 
     :return:         A grayscale clip that only contains the given plane.
     """
+    warnings.warn('vsutil.plane: deprecated in favor of vstools.plane!', DeprecationWarning)
+
     if clip.format.num_planes == 1 and planeno == 0:
         return clip
     return core.std.ShufflePlanes(clip, planeno, vs.GRAY)
@@ -188,6 +201,8 @@ def split(clip: vs.VideoNode, /) -> List[vs.VideoNode]:
 
     :return:      List of planes from the input `clip`.
     """
+    warnings.warn('vsutil.split: deprecated in favor of vstools.split!', DeprecationWarning)
+
     return [clip] if clip.format.num_planes == 1 else cast(List[vs.VideoNode], clip.std.SplitPlanes())
 
 

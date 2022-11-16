@@ -1,8 +1,10 @@
 """
 Functions that give information about clips or mathematical helpers.
 """
-__all__ = ['get_depth', 'get_plane_size', 'get_subsampling', 'get_w', 'is_image', 'scale_value', 'get_lowest_value', 'get_neutral_value', 'get_peak_value']
+__all__ = ['get_depth', 'get_plane_size', 'get_subsampling', 'get_w', 'is_image',
+           'scale_value', 'get_lowest_value', 'get_neutral_value', 'get_peak_value']
 
+import warnings
 from mimetypes import types_map
 from os import path
 from typing import Optional, Tuple, TypeVar, Union
@@ -29,6 +31,8 @@ def get_depth(clip: vs.VideoNode, /) -> int:
 
     :return:      Bit depth of the input `clip`.
     """
+    warnings.warn('vsutil.get_depth: deprecated in favor of vstools.get_depth!', DeprecationWarning)
+
     return clip.format.bits_per_sample
 
 
@@ -46,6 +50,8 @@ def get_plane_size(frame: Union[vs.VideoFrame, vs.VideoNode], /, planeno: int) -
 
     :return:         Tuple of width and height of the desired plane.
     """
+    warnings.warn('vsutil.get_plane_size: deprecated in favor of vstools.get_plane_sizes!', DeprecationWarning)
+
     # Add additional checks on VideoNodes as their size and format can be variable.
     if isinstance(frame, vs.VideoNode):
         if frame.width == 0:
@@ -76,6 +82,8 @@ def get_subsampling(clip: vs.VideoNode, /) -> Union[None, str]:
 
     :return:      Subsampling of the input `clip` as a string (i.e. ``'420'``) or ``None``.
     """
+    warnings.warn('vsutil.get_subsampling: deprecated in favor of vstools.get_subsampling!', DeprecationWarning)
+
     if clip.format.color_family != vs.YUV:
         return None
     if clip.format.subsampling_w == 1 and clip.format.subsampling_h == 1:
@@ -110,6 +118,8 @@ def get_w(height: int, aspect_ratio: float = 16 / 9, *, only_even: bool = True) 
 
     :return:              Calculated width based on input `height`.
     """
+    warnings.warn('vsutil.get_w: deprecated in favor of vstools.get_w!', DeprecationWarning)
+
     width = height * aspect_ratio
     if only_even:
         return round(width / 2) * 2
@@ -155,6 +165,8 @@ def scale_value(value: Union[int, float],
 
     :return:              Scaled numeric value.
     """
+    warnings.warn('vsutil.scale_value: deprecated in favor of vstools.scale_value!', DeprecationWarning)
+
     range_in = types.resolve_enum(types.Range, range_in, 'range_in', scale_value)
     range = types.resolve_enum(types.Range, range, 'range', scale_value)
     range = func.fallback(range, range_in)
@@ -209,6 +221,8 @@ def get_lowest_value(clip: vs.VideoNode, chroma: bool = False) -> float:
 
     :return:      Lowest possible value.
     """
+    warnings.warn('vsutil.get_lowest_value: deprecated in favor of vstools.get_lowest_value!', DeprecationWarning)
+
     is_float = clip.format.sample_type == vs.FLOAT
 
     return -0.5 if chroma and is_float else 0.
@@ -224,6 +238,8 @@ def get_neutral_value(clip: vs.VideoNode, chroma: bool = False) -> float:
 
     :return:      Neutral value.
     """
+    warnings.warn('vsutil.get_neutral_value: deprecated in favor of vstools.get_neutral_value!', DeprecationWarning)
+
     is_float = clip.format.sample_type == vs.FLOAT
 
     return (0. if chroma else 0.5) if is_float else float(1 << (get_depth(clip) - 1))
@@ -239,6 +255,8 @@ def get_peak_value(clip: vs.VideoNode, chroma: bool = False) -> float:
 
     :return:      Highest possible value.
     """
+    warnings.warn('vsutil.get_peak_value: deprecated in favor of vstools.get_peak_value!', DeprecationWarning)
+
     is_float = clip.format.sample_type == vs.FLOAT
 
     return (0.5 if chroma else 1.) if is_float else (1 << get_depth(clip)) - 1.

@@ -12,6 +12,7 @@ __all__ = [
 ]
 
 import inspect
+import warnings
 from functools import partial, wraps
 from typing import Union, Any, TypeVar, Callable, cast, overload, Optional
 
@@ -66,6 +67,8 @@ def disallow_variable_format(function: F | None = None, /, *, only_first: bool =
 
         :return:            Wrapped function.
     """
+    warnings.warn('vsutil.disallow_variable_format: deprecated in favor of vstools.disallow_variable_format!',
+                  DeprecationWarning)
 
     if function is None:
         return cast(Callable[[F], F], partial(disallow_variable_format, only_first=only_first))
@@ -95,6 +98,8 @@ def disallow_variable_resolution(function: F | None = None, /, *, only_first: bo
 
         :return:            Wrapped function.
     """
+    warnings.warn('vsutil.disallow_variable_resolution: deprecated in favor of vstools.disallow_variable_resolution!',
+                  DeprecationWarning)
 
     if function is None:
         return cast(Callable[[F], F], partial(disallow_variable_resolution, only_first=only_first))
@@ -119,6 +124,8 @@ def fallback(value: Optional[T], fallback_value: T) -> T:
 
     :return:                The input `value` or `fallback_value` if `value` is ``None``.
     """
+    warnings.warn('vsutil.fallback: deprecated in favor of vstools.fallback!', DeprecationWarning)
+
     return fallback_value if value is None else value
 
 
@@ -137,6 +144,8 @@ def iterate(base: T, function: Callable[[Union[T, R]], R], count: int) -> Union[
 
     :return:          `function`'s output after repeating `count` number of times.
     """
+    warnings.warn('vsutil.iterate: deprecated in favor of vstools.iterate!', DeprecationWarning)
+
     if count < 0:
         raise ValueError('Count cannot be negative.')
 
@@ -150,7 +159,7 @@ def iterate(base: T, function: Callable[[Union[T, R]], R], count: int) -> Union[
 # This makes sure that,
 # when it is used as the value of a class-variable,
 # python does not prefix calls to this function with ``self``.
-# It also allows to forward calls to 
+# It also allows to forward calls to
 # - `plugin`,
 # - `signature`,
 # - and `return_signature`
@@ -183,7 +192,7 @@ class function:
 
     @property
     def resolved(self) -> vs.Function:
-        """Returns the instance of function 
+        """Returns the instance of function
         """
         return getattr(self.plugin, self.name)
 
@@ -201,4 +210,3 @@ class function:
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         return self.resolved(*args, **kwargs)
-
