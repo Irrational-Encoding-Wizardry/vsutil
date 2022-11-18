@@ -94,7 +94,7 @@ def get_subsampling(clip: vs.VideoNode, /) -> Union[None, str]:
         raise ValueError('Unknown subsampling.')
 
 
-def get_w(height: int, aspect_ratio: float = 16 / 9, *, only_even: bool = True) -> int:
+def get_w(height: int, aspect_ratio: float = 16 / 9, *, only_even: bool = True, mod4: bool = False) -> int:
     """Calculates the width for a clip with the given height and aspect ratio.
 
     >>> get_w(720)
@@ -107,10 +107,14 @@ def get_w(height: int, aspect_ratio: float = 16 / 9, *, only_even: bool = True) 
     :param only_even:     Will return the nearest even integer.
                           ``True`` by default because it imitates the math behind most standard resolutions
                           (e.g. 854x480).
+    :param mod4:          Ensure output is mod4, for when subsampling and/or interlacing require it.
+                          Implies ``only_even`` as mod4 is always even as well.
 
     :return:              Calculated width based on input `height`.
     """
     width = height * aspect_ratio
+    if mod4:
+        return round(width / 4) * 4
     if only_even:
         return round(width / 2) * 2
     return round(width)
