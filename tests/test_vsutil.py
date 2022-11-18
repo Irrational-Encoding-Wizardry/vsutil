@@ -162,6 +162,7 @@ class VsUtilTests(unittest.TestCase):
         self.assertEqual(vsutil.get_w(480, only_even=False), 853)
         self.assertEqual(vsutil.get_w(1080, 4 / 3), 1440)
         self.assertEqual(vsutil.get_w(1080), 1920)
+        self.assertEqual(vsutil.get_w(849, mod4=True), 1508)
 
     def test_iterate(self):
         def double_number(x: int) -> int:
