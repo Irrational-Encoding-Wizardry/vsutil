@@ -4,7 +4,7 @@
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
   inputs.flake-utils.url = "github:numtide/flake-utils";
 
-  outputs = { self, nixpkgs, flake-utils }: flake-utils.lib.eachDefaultSystem (system: 
+  outputs = { self, nixpkgs, flake-utils }: flake-utils.lib.eachSystem [ "x86_64-linux" ] (system: 
     let
       pkgs = import nixpkgs {
         inherit system;
@@ -15,24 +15,13 @@
       python = pkgs.python310;
 
       # On darwin it sadly needs to be monkey-patched still.
-      vapoursynth_python =
-        if nixpkgs.lib.hasSuffix "-darwin" system then
-          python.pkgs.vapoursynth.override {
-            vapoursynth = 
-              pkgs.vapoursynth.overrideAttrs (old: {
-                patches = [];
-                meta.broken = false;
-                meta.platforms = [ system ];
-              });
-          }
-        else
-          python.pkgs.vapoursynth;
+      vapoursynth_python = py: py.pkgs.vapoursynth;
     in
     {
       devShells.default = pkgs.mkShell {
         buildInputs = [
           (python.withPackages (ps: [
-            vapoursynth_python
+            (vapoursynth_python python)
           ]))
         ];
       };
@@ -48,7 +37,7 @@
           builtins.elemAt version 0;
         src = ./.;
         buildInputs = [
-          vapoursynth_python 
+          (vapoursynth_python python)
         ];
         checkPhase = ''
           ${python}/bin/python -m unittest discover -s $src/tests
