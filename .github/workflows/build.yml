@@ -1,4 +1,4 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions 
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
 name: build
@@ -16,7 +16,7 @@ jobs:
       matrix:
         versions:
         - 59
-        python-version: 
+        python-version:
         - "3.10"
 
     steps:
@@ -43,12 +43,3 @@ jobs:
       with:
         nix_path: nixpkgs=channel:nixos-unstable
     - run: nix build .#packages.x86_64-linux.default -L
-
-  darwin:
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v2.4.0
-    - uses: cachix/install-nix-action@v15
-      with:
-        nix_path: nixpkgs=channel:nixos-unstable
-    - run: nix build . -L
