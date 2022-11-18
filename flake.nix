@@ -37,7 +37,7 @@
           builtins.elemAt version 0;
         src = ./.;
         buildInputs = [
-          vapoursynth_python 
+          (vapoursynth_python python)
         ];
         checkPhase = ''
           ${python}/bin/python -m unittest discover -s $src/tests
