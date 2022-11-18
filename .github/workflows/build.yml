@@ -9,11 +9,13 @@ on:
     paths:
       - 'vsutil/**'
       - 'test/**'
+      - '.github/workflows/**'
   pull_request:
     branches: [ master ]
     paths:
       - 'vsutil/**'
       - 'test/**'
+      - '.github/workflows/**'
 
 jobs:
   windows:
