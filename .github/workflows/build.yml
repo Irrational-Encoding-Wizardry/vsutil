@@ -6,8 +6,14 @@ name: build
 on:
   push:
     branches: [ master ]
+    paths:
+      - 'vsutil/**'
+      - 'test/**'
   pull_request:
     branches: [ master ]
+    paths:
+      - 'vsutil/**'
+      - 'test/**'
 
 jobs:
   windows:
