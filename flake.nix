@@ -15,13 +15,13 @@
       python = pkgs.python310;
 
       # On darwin it sadly needs to be monkey-patched still.
-      vapoursynth_python = python.pkgs.vapoursynth;
+      vapoursynth_python = py: py.pkgs.vapoursynth;
     in
     {
       devShells.default = pkgs.mkShell {
         buildInputs = [
           (python.withPackages (ps: [
-            vapoursynth_python
+            (vapoursynth_python python)
           ]))
         ];
       };
